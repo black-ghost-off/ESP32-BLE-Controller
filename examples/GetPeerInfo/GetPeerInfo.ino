@@ -12,7 +12,7 @@
 */
 
 #include <Arduino.h>
-#include <BleController.h> // https://github.com/lemmingDev/ESP32-BLE-Controller
+#include <BleController.h> // https://github.com/black-ghost-off/ESP32-BLE-Controller
 
 #define PEER_INFO_PIN 0 // Pin button is attached to
 

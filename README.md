@@ -58,7 +58,7 @@ Please see updated examples
 
 ## Installation
 - (Make sure you can use the ESP32 with the Arduino IDE. [Instructions can be found here.](https://github.com/espressif/arduino-esp32#installation-instructions))
-- [Download the latest release of this library from the release page.](https://github.com/lemmingDev/ESP32-BLE-Controller/releases)
+- [Download the latest release of this library from the release page.](https://github.com/black-ghost-off/ESP32-BLE-Controller/releases)
 - In the Arduino IDE go to "Sketch" -> "Include Library" -> "Add .ZIP Library..." and select the file you just downloaded.
 - In the Arduino IDE go to "Tools" -> "Manage Libraries..." -> Filter for "NimBLE-Arduino" by h2zero and install.
 - You can now go to "File" -> "Examples" -> "ESP32 BLE Controller" and select an example to get started.

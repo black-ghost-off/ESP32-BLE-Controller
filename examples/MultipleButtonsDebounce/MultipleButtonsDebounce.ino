@@ -15,7 +15,7 @@
 
 #include <Arduino.h>
 #include <Bounce2.h>    // https://github.com/thomasfredericks/Bounce2
-#include <BleController.h> // https://github.com/lemmingDev/ESP32-BLE-Controller
+#include <BleController.h> // https://github.com/black-ghost-off/ESP32-BLE-Controller
 
 #define numOfButtons 10
 

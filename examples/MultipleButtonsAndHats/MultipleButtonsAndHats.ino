@@ -8,7 +8,7 @@
  */
 
 #include <Arduino.h>
-#include <BleController.h> // https://github.com/lemmingDev/ESP32-BLE-Controller
+#include <BleController.h>
 
 BleController BleController;
 

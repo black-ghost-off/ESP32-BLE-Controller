@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <Bounce2.h>    // https://github.com/thomasfredericks/Bounce2
-#include <BleController.h> // https://github.com/lemmingDev/ESP32-BLE-Controller
+#include <BleController.h> // https://github.com/black-ghost-off/ESP32-BLE-Controller
 
 #define BOUNCE_WITH_PROMPT_DETECTION // Make button state changes available immediately
 #define BUTTON_PIN 35

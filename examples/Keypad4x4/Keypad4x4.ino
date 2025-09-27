@@ -7,7 +7,7 @@
 
 #include <Arduino.h>
 #include <Keypad.h>     // https://github.com/Chris--A/Keypad
-#include <BleController.h> // https://github.com/lemmingDev/ESP32-BLE-Controller
+#include <BleController.h> // https://github.com/black-ghost-off/ESP32-BLE-Controller
 
 BleController BleController("ESP32 Keypad", "lemmingDev", 100); // Shows how you can customise the device name, manufacturer name and initial battery level
 

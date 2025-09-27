@@ -23,7 +23,7 @@
  */
 
 #include <Arduino.h>
-#include <BleController.h> // https://github.com/lemmingDev/ESP32-BLE-Controller
+#include <BleController.h> // https://github.com/black-ghost-off/ESP32-BLE-Controller
 
 #define DISCONNECTPIN 0 // Pin disconnect button is attached to
 
