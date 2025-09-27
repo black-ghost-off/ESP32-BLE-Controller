@@ -22,12 +22,12 @@
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/lemmingDev/ESP32-BLE-Controller.git"
+        "url": "https://github.com/black-ghost-off/ESP32-BLE-Controller.git"
     },
     "dependencies": {
         "h2zero/NimBLE-Arduino": "^1.4.0"
     },
-    "homepage": "https://github.com/lemmingDev/ESP32-BLE-Controller",
+    "homepage": "https://github.com/black-ghost-off/ESP32-BLE-Controller",
     "frameworks": "arduino",
     "platforms": "espressif32",
     "exclude": [
