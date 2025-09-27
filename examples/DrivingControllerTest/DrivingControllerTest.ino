@@ -3,7 +3,7 @@
  */
 
 #include <Arduino.h>
-#include <BleGamepad.h>
+#include <BleController.h>
 
 #define numOfButtons 10
 #define numOfHatSwitches 0
@@ -29,7 +29,7 @@ int16_t simMax = 0x7FFF;        // 32767 --> int16_t - 16 bit signed integer - C
 int16_t stepAmount = 0xFF;
 uint16_t delayAmount = 25;
 
-BleGamepad bleGamepad("BLE Driving Controller", "lemmingDev", 100);
+BleController BleController("BLE Driving Controller", "lemmingDev", 100);
 
 void setup()
 {
@@ -37,76 +37,76 @@ void setup()
     Serial.println("Starting BLE work!");
 
     // Setup controller with 10 buttons, accelerator, brake and steering
-    BleGamepadConfiguration bleGamepadConfig;
-    bleGamepadConfig.setAutoReport(false);
-    bleGamepadConfig.setControllerType(CONTROLLER_TYPE_GAMEPAD); // CONTROLLER_TYPE_JOYSTICK, CONTROLLER_TYPE_GAMEPAD (DEFAULT), CONTROLLER_TYPE_MULTI_AXIS
-    bleGamepadConfig.setButtonCount(numOfButtons);
-    bleGamepadConfig.setWhichAxes(enableX, enableY, enableZ, enableRX, enableRY, enableRZ, enableSlider1, enableSlider2);      // Can also be done per-axis individually. All are true by default
-    bleGamepadConfig.setWhichSimulationControls(enableRudder, enableThrottle, enableAccelerator, enableBrake, enableSteering); // Can also be done per-control individually. All are false by default
-    bleGamepadConfig.setHatSwitchCount(numOfHatSwitches);                                                                      // 1 by default
-    bleGamepadConfig.setSimulationMin(simMin);
-    bleGamepadConfig.setSimulationMax(simMax);
+    BleControllerConfiguration BleControllerConfig;
+    BleControllerConfig.setAutoReport(false);
+    BleControllerConfig.setControllerType(CONTROLLER_TYPE_GAMEPAD); // CONTROLLER_TYPE_JOYSTICK, CONTROLLER_TYPE_GAMEPAD (DEFAULT), CONTROLLER_TYPE_MULTI_AXIS
+    BleControllerConfig.setButtonCount(numOfButtons);
+    BleControllerConfig.setWhichAxes(enableX, enableY, enableZ, enableRX, enableRY, enableRZ, enableSlider1, enableSlider2);      // Can also be done per-axis individually. All are true by default
+    BleControllerConfig.setWhichSimulationControls(enableRudder, enableThrottle, enableAccelerator, enableBrake, enableSteering); // Can also be done per-control individually. All are false by default
+    BleControllerConfig.setHatSwitchCount(numOfHatSwitches);                                                                      // 1 by default
+    BleControllerConfig.setSimulationMin(simMin);
+    BleControllerConfig.setSimulationMax(simMax);
     
-    bleGamepad.begin(&bleGamepadConfig);
-    // changing bleGamepadConfig after the begin function has no effect, unless you call the begin function again
+    BleController.begin(&BleControllerConfig);
+    // changing BleControllerConfig after the begin function has no effect, unless you call the begin function again
 
     // Set steering to center
-    bleGamepad.setSteering(axesCenter);
+    BleController.setSteering(axesCenter);
 
     // Set brake and accelerator to min
-    bleGamepad.setBrake(simMin);
-    bleGamepad.setAccelerator(simMax);
+    BleController.setBrake(simMin);
+    BleController.setAccelerator(simMax);
 
-    bleGamepad.sendReport();
+    BleController.sendReport();
 }
 
 void loop()
 {
-    if (bleGamepad.isConnected())
+    if (BleController.isConnected())
     {
         Serial.println("Press all buttons one by one");
         for (int i = 1; i <= numOfButtons; i += 1)
         {
-            bleGamepad.press(i);
-            bleGamepad.sendReport();
+            BleController.press(i);
+            BleController.sendReport();
             delay(100);
-            bleGamepad.release(i);
-            bleGamepad.sendReport();
+            BleController.release(i);
+            BleController.sendReport();
             delay(25);
         }
 
         Serial.println("Move steering from center to min");
         for (int i = axesCenter; i > simMin; i -= stepAmount)
         {
-            bleGamepad.setSteering(i);
-            bleGamepad.sendReport();
+            BleController.setSteering(i);
+            BleController.sendReport();
             delay(delayAmount);
         }
 
         Serial.println("Move steering from min to max");
         for (int i = simMin; i < simMax; i += stepAmount)
         {
-            bleGamepad.setSteering(i);
-            bleGamepad.sendReport();
+            BleController.setSteering(i);
+            BleController.sendReport();
             delay(delayAmount);
         }
 
         Serial.println("Move steering from max to center");
         for (int i = simMax; i > axesCenter; i -= stepAmount)
         {
-            bleGamepad.setSteering(i);
-            bleGamepad.sendReport();
+            BleController.setSteering(i);
+            BleController.sendReport();
             delay(delayAmount);
         }
-        bleGamepad.setSteering(axesCenter);
-        bleGamepad.sendReport();
+        BleController.setSteering(axesCenter);
+        BleController.sendReport();
 
         Serial.println("Move accelerator from min to max");
         // Axis is reversed, so swap min <--> max
         for (int i = simMax; i > simMin; i -= stepAmount)
         {
-            bleGamepad.setAccelerator(i);
-            bleGamepad.sendReport();
+            BleController.setAccelerator(i);
+            BleController.sendReport();
             delay(delayAmount);
         }
 
@@ -114,29 +114,29 @@ void loop()
         // Axis is reversed, so swap min <--> max
         for (int i = simMin; i < simMax; i += stepAmount)
         {
-            bleGamepad.setAccelerator(i);
-            bleGamepad.sendReport();
+            BleController.setAccelerator(i);
+            BleController.sendReport();
             delay(delayAmount);
         }
-        bleGamepad.setAccelerator(simMax);
-        bleGamepad.sendReport();
+        BleController.setAccelerator(simMax);
+        BleController.sendReport();
 
         Serial.println("Move brake from min to max");
         for (int i = simMin; i < simMax; i += stepAmount)
         {
-            bleGamepad.setBrake(i);
-            bleGamepad.sendReport();
+            BleController.setBrake(i);
+            BleController.sendReport();
             delay(delayAmount);
         }
         
         Serial.println("Move brake from max to min");
         for (int i = simMax; i > simMin; i -= stepAmount)
         {
-            bleGamepad.setBrake(i);
-            bleGamepad.sendReport();
+            BleController.setBrake(i);
+            BleController.sendReport();
             delay(delayAmount);
         }
-        bleGamepad.setBrake(simMin);
-        bleGamepad.sendReport();
+        BleController.setBrake(simMin);
+        BleController.sendReport();
     }
 }

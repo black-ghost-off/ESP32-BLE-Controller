@@ -27,9 +27,9 @@
 */
 
 #include <Arduino.h>
-#include <BleGamepad.h>
+#include <BleController.h>
 
-BleGamepad bleGamepad;
+BleController BleController;
 
 int batteryLevel = 100;
 
@@ -37,18 +37,18 @@ void setup()
 {
   Serial.begin(115200);
   Serial.println("Starting BLE work!");
-  bleGamepad.begin();
+  BleController.begin();
 }
 
 void loop()
 {
-  if (bleGamepad.isConnected())
+  if (BleController.isConnected())
   {
-    // bleGamepad.setPowerStateAll(POWER_STATE_PRESENT, POWER_STATE_NOT_DISCHARGING, POWER_STATE_CHARGING, POWER_STATE_GOOD); // Can set all values together or separate as below
-    bleGamepad.setBatteryPowerInformation(POWER_STATE_PRESENT);   // POWER_STATE_UNKNOWN or POWER_STATE_NOT_SUPPORTED or POWER_STATE_NOT_PRESENT or POWER_STATE_PRESENT
-    bleGamepad.setDischargingState(POWER_STATE_NOT_DISCHARGING);  // POWER_STATE_UNKNOWN or POWER_STATE_NOT_SUPPORTED or POWER_STATE_NOT_DISCHARGING or POWER_STATE_DISCHARGING
-    bleGamepad.setChargingState(POWER_STATE_CHARGING);            // POWER_STATE_UNKNOWN or POWER_STATE_NOT_SUPPORTED or POWER_STATE_NOT_CHARGING or POWER_STATE_CHARGING
-    bleGamepad.setPowerLevel(POWER_STATE_GOOD);                   // POWER_STATE_UNKNOWN or POWER_STATE_NOT_SUPPORTED or POWER_STATE_GOOD or POWER_STATE_CRITICAL
+    // BleController.setPowerStateAll(POWER_STATE_PRESENT, POWER_STATE_NOT_DISCHARGING, POWER_STATE_CHARGING, POWER_STATE_GOOD); // Can set all values together or separate as below
+    BleController.setBatteryPowerInformation(POWER_STATE_PRESENT);   // POWER_STATE_UNKNOWN or POWER_STATE_NOT_SUPPORTED or POWER_STATE_NOT_PRESENT or POWER_STATE_PRESENT
+    BleController.setDischargingState(POWER_STATE_NOT_DISCHARGING);  // POWER_STATE_UNKNOWN or POWER_STATE_NOT_SUPPORTED or POWER_STATE_NOT_DISCHARGING or POWER_STATE_DISCHARGING
+    BleController.setChargingState(POWER_STATE_CHARGING);            // POWER_STATE_UNKNOWN or POWER_STATE_NOT_SUPPORTED or POWER_STATE_NOT_CHARGING or POWER_STATE_CHARGING
+    BleController.setPowerLevel(POWER_STATE_GOOD);                   // POWER_STATE_UNKNOWN or POWER_STATE_NOT_SUPPORTED or POWER_STATE_GOOD or POWER_STATE_CRITICAL
 
     if (batteryLevel > 0)
     {
@@ -57,7 +57,7 @@ void loop()
 
     Serial.print("Battery Level Set To: ");
     Serial.println(batteryLevel);
-    bleGamepad.setBatteryLevel(batteryLevel);
+    BleController.setBatteryLevel(batteryLevel);
 
     delay(10000);
   }

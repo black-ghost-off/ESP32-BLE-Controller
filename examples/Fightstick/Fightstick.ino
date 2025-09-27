@@ -9,9 +9,9 @@
  */
 
 #include <Arduino.h>
-#include <BleGamepad.h> // https://github.com/lemmingDev/ESP32-BLE-Gamepad
+#include <BleController.h> // https://github.com/lemmingDev/ESP32-BLE-Gamepad
 
-BleGamepad bleGamepad("BLE Fightstick", "lemmingDev", 100);
+BleController BleController("BLE Fightstick", "lemmingDev", 100);
 
 #define numOfButtons 11
 #define numOfHats 1 // Maximum 4 hat switches supported
@@ -43,19 +43,19 @@ void setup()
         currentHatStates[currentPinIndex] = HIGH;
     }
 
-    BleGamepadConfiguration bleGamepadConfig;
-    bleGamepadConfig.setAutoReport(false);
-    bleGamepadConfig.setWhichAxes(0, 0, 0, 0, 0, 0, 0, 0);	// Disable all axes
-    bleGamepadConfig.setButtonCount(numOfButtons);
-    bleGamepadConfig.setHatSwitchCount(numOfHats);
-    bleGamepad.begin(&bleGamepadConfig);
+    BleControllerConfiguration BleControllerConfig;
+    BleControllerConfig.setAutoReport(false);
+    BleControllerConfig.setWhichAxes(0, 0, 0, 0, 0, 0, 0, 0);	// Disable all axes
+    BleControllerConfig.setButtonCount(numOfButtons);
+    BleControllerConfig.setHatSwitchCount(numOfHats);
+    BleController.begin(&BleControllerConfig);
 
-    // changing bleGamepadConfig after the begin function has no effect, unless you call the begin function again
+    // changing BleControllerConfig after the begin function has no effect, unless you call the begin function again
 }
 
 void loop()
 {
-    if (bleGamepad.isConnected())
+    if (BleController.isConnected())
     {
         // Deal with buttons
         for (byte currentIndex = 0; currentIndex < numOfButtons; currentIndex++)
@@ -66,11 +66,11 @@ void loop()
             {
                 if (currentButtonStates[currentIndex] == LOW)
                 {
-                    bleGamepad.press(physicalButtons[currentIndex]);
+                    BleController.press(physicalButtons[currentIndex]);
                 }
                 else
                 {
-                    bleGamepad.release(physicalButtons[currentIndex]);
+                    BleController.release(physicalButtons[currentIndex]);
                 }
             }
         }
@@ -121,7 +121,7 @@ void loop()
         }
 
         // Set hat values
-        bleGamepad.setHats(hatValues[0], hatValues[1], hatValues[2], hatValues[3]);
+        BleController.setHats(hatValues[0], hatValues[1], hatValues[2], hatValues[3]);
 
         // Update previous states to current states and send report
         // readable, but with compiler warning:
@@ -138,7 +138,7 @@ void loop()
                 previousHatStates[currentIndex] = currentHatStates[currentIndex];
             }
 
-            bleGamepad.sendReport();	// Send a report if any of the button states or hat directions have changed
+            BleController.sendReport();	// Send a report if any of the button states or hat directions have changed
         }
 
         delay(10);	// Reduce for less latency

@@ -6,9 +6,9 @@
  */
 
 #include <Arduino.h>
-#include <BleGamepad.h>
+#include <BleController.h>
 
-BleGamepad bleGamepad;
+BleController BleController;
 
 int batteryLevel = 100;
 
@@ -16,12 +16,12 @@ void setup()
 {
     Serial.begin(115200);
     Serial.println("Starting BLE work!");
-    bleGamepad.begin();
+    BleController.begin();
 }
 
 void loop()
 {
-    if (bleGamepad.isConnected())
+    if (BleController.isConnected())
     {
         if(batteryLevel > 0)
         {
@@ -30,7 +30,7 @@ void loop()
         
         Serial.print("Battery Level Set To: ");
         Serial.println(batteryLevel);
-        bleGamepad.setBatteryLevel(batteryLevel);
+        BleController.setBatteryLevel(batteryLevel);
         delay(30000);
     }
 }

@@ -1,33 +1,33 @@
 /*
    A simple sketch that, upon a button press, shows peer info
 
-   bleGamepad.getPeerInfo(); returns type NimBLEConnInfo
+   BleController.getPeerInfo(); returns type NimBLEConnInfo
    From there, you have access to all info here https://h2zero.github.io/NimBLE-Arduino/class_nim_b_l_e_conn_info.html
 
-   If you just need the MAC address, you can instead call bleGamepad.getAddress() which returns type NimBLEAddress
-   or bleGamepad.getStringAddress() to get it directly as a string
+   If you just need the MAC address, you can instead call BleController.getAddress() which returns type NimBLEAddress
+   or BleController.getStringAddress() to get it directly as a string
 
    This sketch also shows how to access the information used to configure the BLE device such as vid, pid, model number and software revision etc
    See CharacteristicsConfiguration.ino example to see how to set them
 */
 
 #include <Arduino.h>
-#include <BleGamepad.h> // https://github.com/lemmingDev/ESP32-BLE-Gamepad
+#include <BleController.h> // https://github.com/lemmingDev/ESP32-BLE-Gamepad
 
 #define PEER_INFO_PIN 0 // Pin button is attached to
 
-BleGamepad bleGamepad;
+BleController BleController;
 
 void setup()
 {
   Serial.begin(115200);
   pinMode(PEER_INFO_PIN, INPUT_PULLUP);
-  bleGamepad.begin();
+  BleController.begin();
 }
 
 void loop()
 {
-  if (bleGamepad.isConnected())
+  if (BleController.isConnected())
   {
 
     if (digitalRead(PEER_INFO_PIN) == LOW) // On my board, pin 0 is LOW for pressed
@@ -35,14 +35,14 @@ void loop()
       Serial.println("\n----- OUPTPUT PEER INFORMATION -----\n");
 
       // Get the HEX address as a string;
-      Serial.println(bleGamepad.getStringAddress());
+      Serial.println(BleController.getStringAddress());
 
       // Get the HEX address as an NimBLEAddress instance
-      NimBLEAddress bleAddress = bleGamepad.getAddress();
+      NimBLEAddress bleAddress = BleController.getAddress();
       Serial.println(bleAddress.toString().c_str());
 
       // Get values directly from an NimBLEConnInfo instance
-      NimBLEConnInfo peerInfo = bleGamepad.getPeerInfo();
+      NimBLEConnInfo peerInfo = BleController.getPeerInfo();
 
       Serial.println(peerInfo.getAddress().toString().c_str());      // NimBLEAddress
       Serial.println(peerInfo.getIdAddress().toString().c_str());    // NimBLEAddress
@@ -59,17 +59,17 @@ void loop()
       Serial.println(peerInfo.getSecKeySize());                      // uint8_t
 
       Serial.println("\n----- OUPTPUT CONFIGURATION INFORMATION -----\n");
-      Serial.println(bleGamepad.getDeviceName());
-      Serial.println(bleGamepad.getDeviceManufacturer());
-      Serial.println(bleGamepad.configuration.getModelNumber());
-      Serial.println(bleGamepad.configuration.getSoftwareRevision());
-      Serial.println(bleGamepad.configuration.getSerialNumber());
-      Serial.println(bleGamepad.configuration.getFirmwareRevision());
-      Serial.println(bleGamepad.configuration.getHardwareRevision());
-      Serial.println(bleGamepad.configuration.getVid(), HEX);
-      Serial.println(bleGamepad.configuration.getPid(), HEX);
-      Serial.println(bleGamepad.configuration.getGuidVersion());
-      Serial.println(bleGamepad.configuration.getTXPowerLevel());
+      Serial.println(BleController.getDeviceName());
+      Serial.println(BleController.getDeviceManufacturer());
+      Serial.println(BleController.configuration.getModelNumber());
+      Serial.println(BleController.configuration.getSoftwareRevision());
+      Serial.println(BleController.configuration.getSerialNumber());
+      Serial.println(BleController.configuration.getFirmwareRevision());
+      Serial.println(BleController.configuration.getHardwareRevision());
+      Serial.println(BleController.configuration.getVid(), HEX);
+      Serial.println(BleController.configuration.getPid(), HEX);
+      Serial.println(BleController.configuration.getGuidVersion());
+      Serial.println(BleController.configuration.getTXPowerLevel());
       Serial.println();
       delay(1000);
     }

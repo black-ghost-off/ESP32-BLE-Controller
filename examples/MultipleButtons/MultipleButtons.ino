@@ -8,9 +8,9 @@
  */
 
 #include <Arduino.h>
-#include <BleGamepad.h> // https://github.com/lemmingDev/ESP32-BLE-Gamepad
+#include <BleController.h> // https://github.com/lemmingDev/ESP32-BLE-Gamepad
 
-BleGamepad bleGamepad;
+BleController BleController;
 
 #define numOfButtons 10
 
@@ -28,17 +28,17 @@ void setup()
         currentButtonStates[currentPinIndex] = HIGH;
     }
 
-    BleGamepadConfiguration bleGamepadConfig;
-    bleGamepadConfig.setAutoReport(false);
-    bleGamepadConfig.setButtonCount(numOfButtons);
-    bleGamepad.begin(&bleGamepadConfig);
+    BleControllerConfiguration BleControllerConfig;
+    BleControllerConfig.setAutoReport(false);
+    BleControllerConfig.setButtonCount(numOfButtons);
+    BleController.begin(&BleControllerConfig);
 
-    // changing bleGamepadConfig after the begin function has no effect, unless you call the begin function again
+    // changing BleControllerConfig after the begin function has no effect, unless you call the begin function again
 }
 
 void loop()
 {
-    if (bleGamepad.isConnected())
+    if (BleController.isConnected())
     {
         for (byte currentIndex = 0; currentIndex < numOfButtons; currentIndex++)
         {
@@ -48,11 +48,11 @@ void loop()
             {
                 if (currentButtonStates[currentIndex] == LOW)
                 {
-                    bleGamepad.press(physicalButtons[currentIndex]);
+                    BleController.press(physicalButtons[currentIndex]);
                 }
                 else
                 {
-                    bleGamepad.release(physicalButtons[currentIndex]);
+                    BleController.release(physicalButtons[currentIndex]);
                 }
             }
         }
@@ -64,7 +64,7 @@ void loop()
                 previousButtonStates[currentIndex] = currentButtonStates[currentIndex];
             }
 
-            bleGamepad.sendReport();
+            BleController.sendReport();
         }
 
         delay(20);

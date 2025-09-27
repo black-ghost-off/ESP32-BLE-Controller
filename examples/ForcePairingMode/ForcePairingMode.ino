@@ -6,11 +6,11 @@
  * 
  * If it doesn't find another paired device, it will allow you to pair a new one
  * 
- * If you want a more permanent solution, instead use bleGamepad.deleteBond() 
+ * If you want a more permanent solution, instead use BleController.deleteBond() 
  * which will delete the bond for the currently connected client and allow other
  * clients to connect to it
  * 
- * Use bleGamepad.deletAllBonds() to delete all bonds from the gamepad
+ * Use BleController.deletAllBonds() to delete all bonds from the gamepad
  * 
  * After deleting bonds, it is best to unpair them from the client device such
  * as your phone or PC otherwise the gamepad may briefly connect while searching
@@ -23,22 +23,22 @@
  */
 
 #include <Arduino.h>
-#include <BleGamepad.h> // https://github.com/lemmingDev/ESP32-BLE-Gamepad
+#include <BleController.h> // https://github.com/lemmingDev/ESP32-BLE-Gamepad
 
 #define DISCONNECTPIN 0 // Pin disconnect button is attached to
 
-BleGamepad bleGamepad;
+BleController BleController;
 
 void setup()
 {
     Serial.begin(115200);
     pinMode(DISCONNECTPIN, INPUT_PULLUP);
-    bleGamepad.begin();
+    BleController.begin();
 }
 
 void loop()
 {
-    if (bleGamepad.isConnected())
+    if (BleController.isConnected())
     {
         // Enter forced pairing mode 
         // It repeatedly disconnects from currently connected device until a new device is paired
@@ -47,7 +47,7 @@ void loop()
         // Simply reset device to have it revert to previous behaviour
         if (digitalRead(DISCONNECTPIN) == LOW) // On my board, pin 0 is LOW for pressed
         {   
-            bool pairingResult = bleGamepad.enterPairingMode();
+            bool pairingResult = BleController.enterPairingMode();
 
             if(pairingResult)
             {

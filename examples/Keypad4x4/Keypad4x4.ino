@@ -7,9 +7,9 @@
 
 #include <Arduino.h>
 #include <Keypad.h>     // https://github.com/Chris--A/Keypad
-#include <BleGamepad.h> // https://github.com/lemmingDev/ESP32-BLE-Gamepad
+#include <BleController.h> // https://github.com/lemmingDev/ESP32-BLE-Gamepad
 
-BleGamepad bleGamepad("ESP32 Keypad", "lemmingDev", 100); // Shows how you can customise the device name, manufacturer name and initial battery level
+BleController BleController("ESP32 Keypad", "lemmingDev", 100); // Shows how you can customise the device name, manufacturer name and initial battery level
 
 #define ROWS 4
 #define COLS 4
@@ -27,11 +27,11 @@ Keypad customKeypad = Keypad(makeKeymap(keymap), rowPins, colPins, ROWS, COLS);
 
 void setup()
 {
-    BleGamepadConfiguration bleGamepadConfig;
-    bleGamepadConfig.setAutoReport(false);        // Disable auto reports --> You then need to force HID updates with bleGamepad.sendReport()
-    bleGamepad.begin(&bleGamepadConfig);          // Begin library with set values
+    BleControllerConfiguration BleControllerConfig;
+    BleControllerConfig.setAutoReport(false);        // Disable auto reports --> You then need to force HID updates with BleController.sendReport()
+    BleController.begin(&BleControllerConfig);          // Begin library with set values
 
-    // changing bleGamepadConfig after the begin function has no effect, unless you call the begin function again
+    // changing BleControllerConfig after the begin function has no effect, unless you call the begin function again
 }
 
 void loop()
@@ -50,18 +50,18 @@ void KeypadUpdate()
         {
             uint8_t keystate = customKeypad.key[i].kstate;
 
-            if (bleGamepad.isConnected())
+            if (BleController.isConnected())
             {
                 if (keystate == PRESSED)
                 {
-                    bleGamepad.press(customKeypad.key[i].kchar);
+                    BleController.press(customKeypad.key[i].kchar);
                 } // Press or release button based on the current state
                 if (keystate == RELEASED)
                 {
-                    bleGamepad.release(customKeypad.key[i].kchar);
+                    BleController.release(customKeypad.key[i].kchar);
                 }
 
-                bleGamepad.sendReport(); // Send the HID report after values for all button states are updated, and at least one button state had changed
+                BleController.sendReport(); // Send the HID report after values for all button states are updated, and at least one button state had changed
             }
         }
     }

@@ -1,75 +1,75 @@
 #include <Arduino.h>
-#include <BleGamepad.h>
+#include <BleController.h>
 
-BleGamepad bleGamepad;
+BleController BleController;
 
 void setup()
 {
     Serial.begin(115200);
-    BleGamepadConfiguration bleGamepadConfig;
-    bleGamepadConfig.setWhichSpecialButtons(true, true, true, true, true, true, true, true);
+    BleControllerConfiguration BleControllerConfig;
+    BleControllerConfig.setWhichSpecialButtons(true, true, true, true, true, true, true, true);
     // Can also enable special buttons individually with the following <-- They are all disabled by default
-    // bleGamepadConfig.setIncludeStart(true);
-    // bleGamepadConfig.setIncludeSelect(true);
-    // bleGamepadConfig.setIncludeMenu(true);
-    // bleGamepadConfig.setIncludeHome(true);
-    // bleGamepadConfig.setIncludeBack(true);
-    // bleGamepadConfig.setIncludeVolumeInc(true);
-    // bleGamepadConfig.setIncludeVolumeDec(true);
-    // bleGamepadConfig.setIncludeVolumeMute(true);
-    bleGamepad.begin(&bleGamepadConfig);
+    // BleControllerConfig.setIncludeStart(true);
+    // BleControllerConfig.setIncludeSelect(true);
+    // BleControllerConfig.setIncludeMenu(true);
+    // BleControllerConfig.setIncludeHome(true);
+    // BleControllerConfig.setIncludeBack(true);
+    // BleControllerConfig.setIncludeVolumeInc(true);
+    // BleControllerConfig.setIncludeVolumeDec(true);
+    // BleControllerConfig.setIncludeVolumeMute(true);
+    BleController.begin(&BleControllerConfig);
 
-    // Changing bleGamepadConfig after the begin function has no effect, unless you call the begin function again
+    // Changing BleControllerConfig after the begin function has no effect, unless you call the begin function again
 }
 
 void loop()
 {
-    if (bleGamepad.isConnected())
+    if (BleController.isConnected())
     {
         Serial.println("Pressing start and select");
-        bleGamepad.pressStart();
+        BleController.pressStart();
         delay(100);
-        bleGamepad.releaseStart();
+        BleController.releaseStart();
         delay(100);
-        bleGamepad.pressSelect();
+        BleController.pressSelect();
         delay(100);
-        bleGamepad.releaseSelect();
+        BleController.releaseSelect();
         delay(100);
 
         Serial.println("Increasing volume");
-        bleGamepad.pressVolumeInc();
+        BleController.pressVolumeInc();
         delay(100);
-        bleGamepad.releaseVolumeInc();
+        BleController.releaseVolumeInc();
         delay(100);
-        bleGamepad.pressVolumeInc();
+        BleController.pressVolumeInc();
         delay(100);
-        bleGamepad.releaseVolumeInc();
+        BleController.releaseVolumeInc();
         delay(100);
         
         Serial.println("Muting volume");
-        bleGamepad.pressVolumeMute();
+        BleController.pressVolumeMute();
         delay(100);
-        bleGamepad.releaseVolumeMute();
+        BleController.releaseVolumeMute();
         delay(1000);
-        bleGamepad.pressVolumeMute();
+        BleController.pressVolumeMute();
         delay(100);
-        bleGamepad.releaseVolumeMute();
+        BleController.releaseVolumeMute();
 
 
         Serial.println("Pressing menu and back");
-        bleGamepad.pressMenu();
+        BleController.pressMenu();
         delay(100);
-        bleGamepad.releaseMenu();
+        BleController.releaseMenu();
         delay(100);
-        bleGamepad.pressBack();
+        BleController.pressBack();
         delay(100);
-        bleGamepad.releaseBack();
+        BleController.releaseBack();
         delay(100);
 
         Serial.println("Pressing home");
-        bleGamepad.pressHome();
+        BleController.pressHome();
         delay(100);
-        bleGamepad.releaseHome();
+        BleController.releaseHome();
         delay(2000);
     }
 }

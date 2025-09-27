@@ -210,7 +210,7 @@
 #define POWER_STATE_CHARGING        3 // 0b11
 #define POWER_STATE_CRITICAL        3 // 0b11
 
-class BleGamepadConfiguration
+class BleControllerConfiguration
 {
 private:
     uint8_t _controllerType;
@@ -244,7 +244,7 @@ private:
  
 
 public:
-    BleGamepadConfiguration();
+    BleControllerConfiguration();
 
     bool getAutoReport();
     uint8_t getControllerType();

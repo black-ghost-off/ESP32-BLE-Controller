@@ -4,8 +4,8 @@
 # Class
 #######################################
 
-BleGamepad  KEYWORD1
-BleGamepadConfiguration KEYWORD1
+BleController  KEYWORD1
+BleControllerConfiguration KEYWORD1
 
 #######################################
 # Methods and Functions

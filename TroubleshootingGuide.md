@@ -9,7 +9,7 @@ Solution:
 - If you modify the BLE Gamepad configuration, such as device name, device features, button count, axes count or button assignments, you must remove the previously paired connection from the host device (PC, mobile, or console).
 - Go to the host's Bluetooth settings, locate the ESP32 device, and select "Remove," "Delete," "Unpair," or "Forget."
 - Restart both the ESP32 and the host device, then re-pair them to ensure the updated configuration is applied.
-- Ensure you're actually using a custom configuration with ``bleGamepad.begin(&bleGamepadConfig);`` as shown in the CharacteristicsConfiguration.ino example
+- Ensure you're actually using a custom configuration with ``BleController.begin(&BleControllerConfig);`` as shown in the CharacteristicsConfiguration.ino example
 
 ## Button Mapping Issues:
 Symptom: Buttons not responding as expected or incorrect button assignments.  
@@ -34,7 +34,7 @@ Symptom: Difficulties in setting up a custom configuration for the gamepad.
 Solution:
 - Refer to the library's examples and documentation to understand the correct procedures for custom configurations.
 - Ensure that all parameters are set correctly and that there are no conflicts in the configuration.
-- Ensure you're actually using a custom configuration with ``bleGamepad.begin(&bleGamepadConfig);`` as shown in the CharacteristicsConfiguration.ino example
+- Ensure you're actually using a custom configuration with ``BleController.begin(&BleControllerConfig);`` as shown in the CharacteristicsConfiguration.ino example
 
 ## Multiple Device Pairing Issues:
 Symptom: Inability to pair multiple devices simultaneously.
