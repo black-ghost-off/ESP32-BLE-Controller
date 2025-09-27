@@ -1,0 +1,62 @@
+{
+    "name": "ESP32-BLE-Controller",
+    "version": "0.0.2",
+    "description": "BLE Bluetooth HID Controller library for ESP32 with multi-functional HID device support (Controller + Keyboard + Mouse)",
+    "keywords": [
+        "bluetooth",
+        "ble",
+        "hid",
+        "controller",
+        "gamepad",
+        "keyboard",
+        "mouse",
+        "esp32",
+        "nimble"
+    ],
+    "authors": [
+        {
+            "name": "ESP32-BLE-Controller Contributors",
+            "maintainer": true
+        }
+    ],
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/lemmingDev/ESP32-BLE-Controller.git"
+    },
+    "dependencies": {
+        "h2zero/NimBLE-Arduino": "^1.4.0"
+    },
+    "homepage": "https://github.com/lemmingDev/ESP32-BLE-Controller",
+    "frameworks": "arduino",
+    "platforms": "espressif32",
+    "exclude": [
+        ".*",
+        "compile_commands.json",
+        "platformio.ini",
+        "Makefile",
+        "*.tar.gz",
+        "test/*"
+    ],
+    "include": [
+        "src",
+        "examples",
+        "*.h",
+        "*.cpp",
+        "README.md",
+        "keywords.txt",
+        "library.properties",
+        "license.txt"
+    ],
+    "export": {
+        "include": [
+            "*.h",
+            "*.cpp",
+            "examples/*",
+            "README.md",
+            "keywords.txt",
+            "library.properties",
+            "license.txt"
+        ]
+    }
+}
