@@ -9,7 +9,7 @@
 
    Windows joy.cpl will show the gyroscope data as X Rotation, Y Rotation and Z Rotation
    Windows joy.cpl will not show the accelerometer data, but you can see it using online
-   tools such as https://hardwaretester.com/gamepad
+   tools such as https://hardwaretester.com/Controller
 
    This HID descriptor uses the correct HID usage IDs for gyroscope (33, 34, 35 -> Rotation -> Rx, Ry, Rz) and
    accelerometer (40, 41, 42 -> Vector -> Vx, Vy, Vz)
@@ -36,7 +36,7 @@
 #define enableSlider1 false
 #define enableSlider2 false
 
-int16_t motMin = 0x8000;       // -32767 --> Some non-Windows operating systems and web based gamepad testers don't like min axis set below 0, so 0 is set by default
+int16_t motMin = 0x8000;       // -32767 --> Some non-Windows operating systems and web based Controller testers don't like min axis set below 0, so 0 is set by default
 int16_t motCenter = 0x00;
 //int16_t motMin = 0x00;         // Set motionulation minimum axes to zero.
 //int16_t motCenter = 0x3FFF;
@@ -54,7 +54,7 @@ void setup()
   // Setup controller with 10 buttons, gyroscope and accelerometer
   BleControllerConfiguration BleControllerConfig;
   BleControllerConfig.setAutoReport(false);
-  BleControllerConfig.setControllerType(CONTROLLER_TYPE_MULTI_AXIS); // CONTROLLER_TYPE_JOYSTICK, CONTROLLER_TYPE_GAMEPAD (DEFAULT), CONTROLLER_TYPE_MULTI_AXIS
+  BleControllerConfig.setControllerType(CONTROLLER_TYPE_MULTI_AXIS); // CONTROLLER_TYPE_JOYSTICK, CONTROLLER_TYPE_CONTROLLER (DEFAULT), CONTROLLER_TYPE_MULTI_AXIS
   BleControllerConfig.setButtonCount(numOfButtons);
   BleControllerConfig.setWhichAxes(enableX, enableY, enableZ, enableRX, enableRY, enableRZ, enableSlider1, enableSlider2);      // Can also be done per-axis individually. All are true by default
   BleControllerConfig.setHatSwitchCount(numOfHatSwitches);                                                                      // 1 by default

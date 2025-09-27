@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <Bounce2.h>    // https://github.com/thomasfredericks/Bounce2
-#include <BleController.h> // https://github.com/lemmingDev/ESP32-BLE-Gamepad
+#include <BleController.h> // https://github.com/lemmingDev/ESP32-BLE-Controller
 
 #define BOUNCE_WITH_PROMPT_DETECTION // Make button state changes available immediately
 #define BUTTON_PIN 35
@@ -11,7 +11,7 @@ BleController BleController;       // Instantiate a BleController object
 
 void setup()
 {
-    BleController.begin(); // Begin the gamepad
+    BleController.begin(); // Begin the Controller
 
     pinMode(BUTTON_PIN, INPUT_PULLUP); // Setup the button with an internal pull-up
 
@@ -29,7 +29,7 @@ void loop()
 
         int value = debouncer.read(); // Get the updated value
 
-        // Press/release gamepad button and turn on or off the LED as determined by the state
+        // Press/release Controller button and turn on or off the LED as determined by the state
         if (value == LOW)
         {
             digitalWrite(LED_PIN, HIGH);

@@ -3,7 +3,7 @@
  */
 
 #include <Arduino.h>
-#include <BleController.h> // https://github.com/lemmingDev/ESP32-BLE-Gamepad
+#include <BleController.h> // https://github.com/lemmingDev/ESP32-BLE-Controller
 
 #define BUTTONPIN 35 // Pin button is attached to
 

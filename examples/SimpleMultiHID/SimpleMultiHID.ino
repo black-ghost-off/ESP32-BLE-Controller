@@ -1,7 +1,7 @@
 /*
  * Simple Multi-HID Example
  *
- * This example shows basic usage of gamepad, keyboard, and mouse
+ * This example shows basic usage of Controller, keyboard, and mouse
  * functionality on ESP32-C3 with a single BLE connection.
  *
  * The device will cycle through different input types every few seconds.
@@ -24,8 +24,8 @@ void loop() {
   if (bleDevice.isConnected()) {
     Serial.println("Connected! Running demos...");
 
-    // Gamepad demo
-    Serial.println("1. Gamepad: Pressing button 1");
+    // Controller demo
+    Serial.println("1. Controller: Pressing button 1");
     bleDevice.press(BUTTON_1);
     bleDevice.sendReport();
     delay(500);
@@ -44,8 +44,8 @@ void loop() {
     delay(1000);
 
     // Combined demo
-    Serial.println("4. Combined: Gamepad button + typing");
-    bleDevice.press(BUTTON_2); // Hold gamepad button
+    Serial.println("4. Combined: Controller button + typing");
+    bleDevice.press(BUTTON_2); // Hold Controller button
     bleDevice.sendReport();
     bleDevice.keyboardPrint("Gaming!"); // Type text
     delay(500);

@@ -3,7 +3,7 @@
 ## Common Issues and Solutions
 
 ### 1. Device Not Recognized as Multi-HID
-**Symptoms**: Device only appears as gamepad, keyboard or mouse functions don't work
+**Symptoms**: Device only appears as Controller, keyboard or mouse functions don't work
 **Solutions**:
 - Ensure you're using the updated library with multi-HID support
 - Check that the HID descriptor includes all three device types
@@ -11,10 +11,10 @@
 - Restart the ESP32-C3 and try again
 
 ### 2. Some Functions Not Working
-**Symptoms**: Gamepad works but keyboard/mouse doesn't (or vice versa)
+**Symptoms**: Controller works but keyboard/mouse doesn't (or vice versa)
 **Solutions**:
 - Check that you're calling the correct send functions:
-  - `sendReport()` for gamepad
+  - `sendReport()` for Controller
   - `sendKeyboardReport()` for keyboard (called automatically by most keyboard functions)
   - `sendMouseReport()` for mouse (called automatically by most mouse functions)
 - Verify the device is connected with `isConnected()`
@@ -69,14 +69,14 @@
 
 ### 1. Enable Debug Output
 ```cpp
-#define BLE_GAMEPAD_DEBUG 1
+#define BLE_CONTROLLER_DEBUG 1
 ```
 This will print HID reports to serial for debugging.
 
 ### 2. Test Individual Functions
 Test each input type separately:
 ```cpp
-// Test gamepad only
+// Test Controller only
 bleDevice.press(BUTTON_1);
 bleDevice.sendReport();
 
@@ -102,7 +102,7 @@ Serial.println("Free heap: " + String(ESP.getFreeHeap()));
 
 ### 5. Verify Report IDs
 Ensure the correct report IDs are being used:
-- Gamepad: 0x01 (GAMEPAD_REPORT_ID)
+- Controller: 0x01 (CONTROLLER_REPORT_ID)
 - Keyboard: 0x02 (KEYBOARD_REPORT_ID)  
 - Mouse: 0x03 (MOUSE_REPORT_ID)
 

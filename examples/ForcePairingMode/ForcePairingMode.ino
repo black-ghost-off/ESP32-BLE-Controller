@@ -1,6 +1,6 @@
 /*
  * A simple sketch that, upon a button press, disconnects from an aggressive client 
- * until a new client connects to the gamepad
+ * until a new client connects to the Controller
  * 
  * If it finds another client that's already paired, it will connect to that
  * 
@@ -10,12 +10,12 @@
  * which will delete the bond for the currently connected client and allow other
  * clients to connect to it
  * 
- * Use BleController.deletAllBonds() to delete all bonds from the gamepad
+ * Use BleController.deletAllBonds() to delete all bonds from the Controller
  * 
  * After deleting bonds, it is best to unpair them from the client device such
- * as your phone or PC otherwise the gamepad may briefly connect while searching
+ * as your phone or PC otherwise the Controller may briefly connect while searching
  *
- * The deleteBond and deletAllBonds functions can optionally reset the gamepad with
+ * The deleteBond and deletAllBonds functions can optionally reset the Controller with
  * deletAllBonds(true) or deleteBond(true), although it shouldn't be needed
  * as the advertising should now start again after a client is disconnected
  * 
@@ -23,7 +23,7 @@
  */
 
 #include <Arduino.h>
-#include <BleController.h> // https://github.com/lemmingDev/ESP32-BLE-Gamepad
+#include <BleController.h> // https://github.com/lemmingDev/ESP32-BLE-Controller
 
 #define DISCONNECTPIN 0 // Pin disconnect button is attached to
 

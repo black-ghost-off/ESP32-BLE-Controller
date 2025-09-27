@@ -25,7 +25,7 @@ void setup()
   Serial.begin(115200);
   Serial.println("Starting BLE work!");
   BleControllerConfig.setAutoReport(false);
-  BleControllerConfig.setControllerType(CONTROLLER_TYPE_GAMEPAD); // CONTROLLER_TYPE_JOYSTICK, CONTROLLER_TYPE_GAMEPAD (DEFAULT), CONTROLLER_TYPE_MULTI_AXIS
+  BleControllerConfig.setControllerType(CONTROLLER_TYPE_CONTROLLER); // CONTROLLER_TYPE_JOYSTICK, CONTROLLER_TYPE_CONTROLLER (DEFAULT), CONTROLLER_TYPE_MULTI_AXIS
   BleControllerConfig.setVid(0xe502);
   BleControllerConfig.setPid(0xabcd);
   BleControllerConfig.setTXPowerLevel(txPowerLevel);  // Defaults to 9 if not set. (Range: -12 to 9 dBm)
@@ -36,12 +36,12 @@ void setup()
   BleControllerConfig.setFirmwareRevision("2.0");
   BleControllerConfig.setHardwareRevision("1.7");
 
-  // Some non-Windows operating systems and web based gamepad testers don't like min axis set below 0, so 0 is set by default
+  // Some non-Windows operating systems and web based Controller testers don't like min axis set below 0, so 0 is set by default
   //BleControllerConfig.setAxesMin(0x8001); // -32767 --> int16_t - 16 bit signed integer - Can be in decimal or hexadecimal
   BleControllerConfig.setAxesMin(0x0000); // 0 --> int16_t - 16 bit signed integer - Can be in decimal or hexadecimal
   BleControllerConfig.setAxesMax(0x7FFF); // 32767 --> int16_t - 16 bit signed integer - Can be in decimal or hexadecimal
 
-  BleController.begin(&BleControllerConfig); // Begin gamepad with configuration options
+  BleController.begin(&BleControllerConfig); // Begin Controller with configuration options
   
   // Change power level to 6
   BleController.setTXPowerLevel(6);    // The default of 9 (strongest transmit power level) will be used if not set

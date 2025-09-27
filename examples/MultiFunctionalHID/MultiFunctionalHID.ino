@@ -2,10 +2,10 @@
  * ESP32-C3 Multi-functional HID Device Example
  *
  * This example demonstrates how to use the ESP32-C3 as a combined
- * gamepad, keyboard, and mouse over a single BLE connection.
+ * Controller, keyboard, and mouse over a single BLE connection.
  *
  * Features:
- * - Gamepad functionality (buttons, joysticks, triggers)
+ * - Controller functionality (buttons, joysticks, triggers)
  * - Keyboard functionality (key presses, text input, modifiers)
  * - Mouse functionality (clicks, movement, scroll wheel)
  * - All combined in one HID device descriptor
@@ -18,9 +18,9 @@
  * 1. Upload this code to your ESP32-C3
  * 2. Pair with a computer/phone via Bluetooth
  * 3. The device will appear as a multi-functional HID device
- * 4. Use the functions to send gamepad, keyboard, or mouse inputs
+ * 4. Use the functions to send Controller, keyboard, or mouse inputs
  *
- * Author: Enhanced ESP32-BLE-Gamepad Library
+ * Author: Enhanced ESP32-BLE-Controller Library
  * License: Same as original library
  */
 
@@ -31,7 +31,7 @@
 BleController BleController("ESP32-C3 Multi-HID", "Espressif Systems");
 
 // Demo button pins (adjust according to your hardware)
-#define GAMEPAD_BUTTON_PIN 2  // Button for gamepad demo
+#define CONTROLLER_BUTTON_PIN 2  // Button for Controller demo
 #define KEYBOARD_BUTTON_PIN 3 // Button for keyboard demo
 #define MOUSE_BUTTON_PIN 4    // Button for mouse demo
 
@@ -40,11 +40,11 @@ void setup() {
   Serial.println("Starting ESP32-C3 Multi-functional HID Device");
 
   // Initialize buttons with pull-up resistors
-  pinMode(GAMEPAD_BUTTON_PIN, INPUT_PULLUP);
+  pinMode(CONTROLLER_BUTTON_PIN, INPUT_PULLUP);
   pinMode(KEYBOARD_BUTTON_PIN, INPUT_PULLUP);
   pinMode(MOUSE_BUTTON_PIN, INPUT_PULLUP);
 
-  // Configure gamepad settings (optional)
+  // Configure Controller settings (optional)
   BleControllerConfiguration BleControllerConfig;
   BleControllerConfig.setAutoReport(false); // Don't auto-send reports
   BleControllerConfig.setButtonCount(16);   // 16 buttons
@@ -52,7 +52,7 @@ void setup() {
   BleControllerConfig.setAxesMax(32767);    // 16-bit axes resolution
   BleControllerConfig.setAxesMin(-32767);
 
-  // Begin the BLE gamepad with multi-HID support
+  // Begin the BLE Controller with multi-HID support
   BleController.begin(&BleControllerConfig);
 
   Serial.println("Multi-HID device started!");
@@ -61,8 +61,8 @@ void setup() {
 
 void loop() {
   if (BleController.isConnected()) {
-    // Demo 1: Gamepad functionality
-    demoGamepad();
+    // Demo 1: Controller functionality
+    demoController();
     delay(100);
 
     // Demo 2: Keyboard functionality
@@ -82,13 +82,13 @@ void loop() {
   }
 }
 
-void demoGamepad() {
-  static unsigned long lastGamepadDemo = 0;
+void demoController() {
+  static unsigned long lastControllerDemo = 0;
 
-  if (millis() - lastGamepadDemo > 2000) { // Every 2 seconds
-    Serial.println("Gamepad Demo: Button press and joystick movement");
+  if (millis() - lastControllerDemo > 2000) { // Every 2 seconds
+    Serial.println("Controller Demo: Button press and joystick movement");
 
-    // Press gamepad button 1
+    // Press Controller button 1
     BleController.press(BUTTON_1);
     BleController.sendReport();
     delay(100);
@@ -103,7 +103,7 @@ void demoGamepad() {
     BleController.setLeftThumb(0, 0);
     BleController.sendReport();
 
-    lastGamepadDemo = millis();
+    lastControllerDemo = millis();
   }
 }
 
@@ -195,10 +195,10 @@ void demoCombined() {
   static unsigned long lastCombinedDemo = 0;
 
   if (millis() - lastCombinedDemo > 10000) { // Every 10 seconds
-    Serial.println("Combined Demo: Gamepad + Keyboard + Mouse");
+    Serial.println("Combined Demo: Controller + Keyboard + Mouse");
 
-    // Gaming scenario: Press gamepad button while typing in chat
-    BleController.press(BUTTON_1); // Hold gamepad button
+    // Gaming scenario: Press Controller button while typing in chat
+    BleController.press(BUTTON_1); // Hold Controller button
     BleController.sendReport();
 
     delay(100);
@@ -211,7 +211,7 @@ void demoCombined() {
 
     delay(100);
 
-    BleController.release(BUTTON_1); // Release gamepad button
+    BleController.release(BUTTON_1); // Release Controller button
     BleController.sendReport();
 
     Serial.println("  Combined action completed");
@@ -221,8 +221,8 @@ void demoCombined() {
 
 // Hardware button handlers (if using physical buttons)
 void handleHardwareButtons() {
-  // Gamepad button
-  if (digitalRead(GAMEPAD_BUTTON_PIN) == LOW) {
+  // Controller button
+  if (digitalRead(CONTROLLER_BUTTON_PIN) == LOW) {
     BleController.press(BUTTON_1);
     BleController.sendReport();
     delay(50); // Debounce
@@ -270,9 +270,9 @@ void mediaControls() {
 
 void customHIDReport() {
   // Example of sending custom raw HID reports
-  uint8_t customGamepadReport[] = {0x01, 0xFF, 0x00, 0x7F, 0x7F,
+  uint8_t customControllerReport[] = {0x01, 0xFF, 0x00, 0x7F, 0x7F,
                                    0x00, 0x00, 0x00, 0x00};
-  BleController.rawAction(customGamepadReport, sizeof(customGamepadReport));
+  BleController.rawAction(customControllerReport, sizeof(customControllerReport));
 
   uint8_t customKeyboardReport[] = {0x02, 0x02, 0x00, 0x04, 0x00,
                                     0x00, 0x00, 0x00, 0x00}; // Shift+A

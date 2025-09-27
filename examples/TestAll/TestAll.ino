@@ -1,5 +1,5 @@
 /*
- * Test all gamepad buttons, axes and dpad
+ * Test all Controller buttons, axes and dpad
  */
 
 #include <Arduino.h>
@@ -16,12 +16,12 @@ void setup()
     Serial.begin(115200);
     Serial.println("Starting BLE work!");
     BleControllerConfig.setAutoReport(false);
-    BleControllerConfig.setControllerType(CONTROLLER_TYPE_GAMEPAD); // CONTROLLER_TYPE_JOYSTICK, CONTROLLER_TYPE_GAMEPAD (DEFAULT), CONTROLLER_TYPE_MULTI_AXIS
+    BleControllerConfig.setControllerType(CONTROLLER_TYPE_CONTROLLER); // CONTROLLER_TYPE_JOYSTICK, CONTROLLER_TYPE_CONTROLLER (DEFAULT), CONTROLLER_TYPE_MULTI_AXIS
     BleControllerConfig.setButtonCount(numOfButtons);
     BleControllerConfig.setHatSwitchCount(numOfHatSwitches);
     BleControllerConfig.setVid(0xe502);
     BleControllerConfig.setPid(0xabcd);
-    // Some non-Windows operating systems and web based gamepad testers don't like min axis set below 0, so 0 is set by default
+    // Some non-Windows operating systems and web based Controller testers don't like min axis set below 0, so 0 is set by default
     //BleControllerConfig.setAxesMin(0x8001); // -32767 --> int16_t - 16 bit signed integer - Can be in decimal or hexadecimal
     BleControllerConfig.setAxesMin(0x0000); // 0 --> int16_t - 16 bit signed integer - Can be in decimal or hexadecimal
     BleControllerConfig.setAxesMax(0x7FFF); // 32767 --> int16_t - 16 bit signed integer - Can be in decimal or hexadecimal 

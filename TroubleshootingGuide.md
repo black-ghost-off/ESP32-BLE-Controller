@@ -6,7 +6,7 @@ Symptom: Updated configurations (e.g., button count, button mappings, device nam
 Cause: Many host operating systems cache Bluetooth device characteristics (e.g., device name, button configurations, and HID descriptors) for faster reconnections. When the ESP32 configuration changes, the cached data may no longer match the updated settings, leading to inconsistencies.  
 
 Solution:
-- If you modify the BLE Gamepad configuration, such as device name, device features, button count, axes count or button assignments, you must remove the previously paired connection from the host device (PC, mobile, or console).
+- If you modify the BLE Controller configuration, such as device name, device features, button count, axes count or button assignments, you must remove the previously paired connection from the host device (PC, mobile, or console).
 - Go to the host's Bluetooth settings, locate the ESP32 device, and select "Remove," "Delete," "Unpair," or "Forget."
 - Restart both the ESP32 and the host device, then re-pair them to ensure the updated configuration is applied.
 - Ensure you're actually using a custom configuration with ``BleController.begin(&BleControllerConfig);`` as shown in the CharacteristicsConfiguration.ino example
@@ -29,7 +29,7 @@ Solution:
 - ESP32, ESP32-C3 and ESP32-S3 series have been tested to work
 
 ## Custom Configuration Challenges:
-Symptom: Difficulties in setting up a custom configuration for the gamepad.  
+Symptom: Difficulties in setting up a custom configuration for the Controller.  
 
 Solution:
 - Refer to the library's examples and documentation to understand the correct procedures for custom configurations.
@@ -40,7 +40,7 @@ Solution:
 Symptom: Inability to pair multiple devices simultaneously.
 
 Solution:
-- Update your ESP32-BLE-Gamepad and NimBLE-Arduino libraries to the latest versions
+- Update your ESP32-BLE-Controller and NimBLE-Arduino libraries to the latest versions
 - Try setting different PID values, though this shouldn't be needed
 
 ## Slow or Inconsistent Connections:
@@ -49,14 +49,14 @@ Symptom: The ESP32 takes a long time to connect or fails to connect intermittent
 Solution:
 - Ensure that the ESP32 is in close proximity to the host device to avoid signal interference.
 - Check for any power supply issues; unstable power can affect Bluetooth performance.
-- Update the ESP32 firmware and the BLE-Gamepad library to the latest versions, as updates often include connectivity improvements.
+- Update the ESP32 firmware and the BLE-Controller library to the latest versions, as updates often include connectivity improvements.
 - Try setting a stronger TX power level (9 is the highest) as shown in example CharacteristicsConfiguration.ino
 
 ## High Latency or Unresponsive Controls:
-Symptom: Noticeable delay between input on the gamepad and action on the host device.  
+Symptom: Noticeable delay between input on the Controller and action on the host device.  
 
 Solution:
-- Optimize the code to reduce any delays in the loop handling the gamepad inputs.
+- Optimize the code to reduce any delays in the loop handling the Controller inputs.
 - Minimize the use of delay functions in the code, as they can introduce latency.
 - Ensure that the BLE connection interval is set appropriately for low-latency communication.
 
@@ -66,7 +66,7 @@ Symptom: Certain GPIO pins not working as intended for button inputs or analog r
 Solution:
 - Consult the ESP32 pinout to ensure that the selected pins support the desired functions.
 - Avoid using pins that are reserved or have dual functions that might interfere with input readings.
-- Test the pins independently to confirm their functionality before integrating them into the gamepad setup.
+- Test the pins independently to confirm their functionality before integrating them into the Controller setup.
 - Pinouts:
   - [ESP32](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/gpio.html)
   - [ESP32-C3](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/api-reference/peripherals/gpio.html)

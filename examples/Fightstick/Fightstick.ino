@@ -9,7 +9,7 @@
  */
 
 #include <Arduino.h>
-#include <BleController.h> // https://github.com/lemmingDev/ESP32-BLE-Gamepad
+#include <BleController.h> // https://github.com/lemmingDev/ESP32-BLE-Controller
 
 BleController BleController("BLE Fightstick", "lemmingDev", 100);
 

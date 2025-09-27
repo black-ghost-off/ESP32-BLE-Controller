@@ -1,24 +1,9 @@
-# ESP32-BLE-Gamepad
+# ESP32-BLE-Controller
 
-![Build](h - [x] Nordic UART Service functionality at same time as gamepad. See examples
- - [x] **Multi-functional HID Device support** (Gamepad + Keyboard + Mouse in single connection)
- - [x] **Keyboard functionality** (Key presses, text input, modifier keys)
- - [x] **Mouse functionality** (Clicks, movement, scroll wheel)
- - [x] **Combined input modes** (Use gamepad, keyboard, and mouse simultaneously)
- - [x] Compatible with Windows
- - [x] Compatible with Android (Android OS maps default buttons / axes / hats slightly differently than Windows) (see notes)
- - [x] Compatible with Linux (limited testing)
- - [x] Compatible with MacOS X (limited testing)
- - [ ] Compatible with iOS (No - not even for accessibility switch - This is not a "Made for iPhone" (MFI) compatible device)
-                           (Use the Xinput fork suggested below which has been tested to work)github.com/lemmingDev/ESP32-BLE-Gamepad/actions/workflows/main.yml/badge.svg)
-![PlatformIO](https://github.com/lemmingDev/ESP32-BLE-Gamepad/actions/workflows/main.yml/platform.svg)
-
-BLE Bluetooth HID GAMEPAD library for ESP32
+Bassed on [ESP32-BLE-Gamepad](https://github.com/lemmingDev/ESP32-BLE-Gamepad)
 
 ## License
 Published under the MIT license. Please see license.txt.
-
-It would be great however if any improvements are fed back into this version.
 
 ## Features
 
@@ -39,7 +24,11 @@ It would be great however if any improvements are fed back into this version.
  - [x] Uses efficient NimBLE bluetooth library
  - [x] Output report function
  - [x] Functions available for force pairing/ignore current client and/or delete pairings
- - [x] Nordic UART Service functionality at same time as gamepad. See examples
+ - [x] Nordic UART Service functionality at same time as Controller. See examples
+ - [x] Multi-functional HID device support (Controller + Keyboard + Mouse in single BLE connection)
+ - [x] Keyboard functionality (key press/release, text input, modifier keys, function keys)
+ - [x] Mouse functionality (left/right/middle click, movement, scroll wheel)
+ - [x] Raw HID report support for keyboard and mouse
  - [x] Compatible with Windows
  - [x] Compatible with Android (Android OS maps default buttons / axes / hats slightly differently than Windows) (see notes)
  - [x] Compatible with Linux (limited testing)
@@ -69,16 +58,16 @@ Please see updated examples
 
 ## Installation
 - (Make sure you can use the ESP32 with the Arduino IDE. [Instructions can be found here.](https://github.com/espressif/arduino-esp32#installation-instructions))
-- [Download the latest release of this library from the release page.](https://github.com/lemmingDev/ESP32-BLE-Gamepad/releases)
+- [Download the latest release of this library from the release page.](https://github.com/lemmingDev/ESP32-BLE-Controller/releases)
 - In the Arduino IDE go to "Sketch" -> "Include Library" -> "Add .ZIP Library..." and select the file you just downloaded.
 - In the Arduino IDE go to "Tools" -> "Manage Libraries..." -> Filter for "NimBLE-Arduino" by h2zero and install.
-- You can now go to "File" -> "Examples" -> "ESP32 BLE Gamepad" and select an example to get started.
+- You can now go to "File" -> "Examples" -> "ESP32 BLE Controller" and select an example to get started.
 
 ## Example
 
 ``` C++
 /*
- * This example turns the ESP32 into a Bluetooth LE gamepad that presses buttons and moves axis
+ * This example turns the ESP32 into a Bluetooth LE Controller that presses buttons and moves axis
  *
  * At the moment we are using the default settings, but they can be canged using a BleControllerConfig instance as parameter for the begin function.
  *
@@ -142,7 +131,7 @@ void loop()
 }
 
 ```
-By default, reports are sent on every button press/release or axis/slider/hat/simulation movement, however this can be disabled, and then you manually call sendReport on the gamepad instance as shown in the IndividualAxes.ino example.
+By default, reports are sent on every button press/release or axis/slider/hat/simulation movement, however this can be disabled, and then you manually call sendReport on the Controller instance as shown in the IndividualAxes.ino example.
 
 VID and PID values can be set. See TestAll.ino for example.
 
@@ -150,10 +139,10 @@ There is also Bluetooth specific information that you can use (optional):
 
 Instead of `BleController BleController;` you can do `BleController BleController("Bluetooth Device Name", "Bluetooth Device Manufacturer", 100);`.
 The third parameter is the initial battery level of your device.
-By default the battery level will be set to 100%, the device name will be `ESP32 BLE Gamepad` and the manufacturer will be `Espressif`.
+By default the battery level will be set to 100%, the device name will be `ESP32 BLE Controller` and the manufacturer will be `Espressif`.
 
 Battery level can be set during operation by calling, for example, BleController.setBatteryLevel(80);
-Update sent on next gamepad update if auto reporting is not enabled
+Update sent on next Controller update if auto reporting is not enabled
 
 
 ## Troubleshooting Guide
@@ -164,26 +153,26 @@ Credits to [T-vK](https://github.com/T-vK) as this library is based on his ESP32
 
 Credits to [chegewara](https://github.com/chegewara) as the ESP32-BLE-Mouse library is based on [this piece of code](https://github.com/nkolban/esp32-snippets/issues/230#issuecomment-473135679) that he provided.
 
-Credits to [wakwak-koba](https://github.com/wakwak-koba) for the NimBLE [code](https://github.com/wakwak-koba/ESP32-NimBLE-Gamepad) that he provided.
+Credits to [wakwak-koba](https://github.com/wakwak-koba) for the NimBLE [code](https://github.com/wakwak-koba/ESP32-NimBLE-Controller) that he provided.
 
 ## Notes
-This library allows you to make the ESP32 act as a Bluetooth Gamepad and control what it does.  
+This library allows you to make the ESP32 act as a Bluetooth Controller and control what it does.  
 Relies on [NimBLE-Arduino](https://github.com/h2zero/NimBLE-Arduino)
 
 Use [this](http://www.planetpointy.co.uk/joystick-test-application/) Windows test app to test/see all of the buttons
 Ensure you have Direct X 9 installed
 
-Gamepads desgined for Android use a different button mapping. This effects analog triggers, where the standard left and right trigger axes are not detected.
+Controllers desgined for Android use a different button mapping. This effects analog triggers, where the standard left and right trigger axes are not detected.
 Android calls the HID report for right trigger `"GAS"` and left trigger `"BRAKE"`. Enabling the `"Accelerator"` and `"Brake"` simulation controls allows them to be used instead of right and left trigger.
 
 Right thumbstick on Windows is usually z, rz, whereas on Android, this may be z, rx, so you may want to set them separately with setZ and setRX, instead of using setRightThumb(z, rz), or use setRightThumbAndroid(z, rx)
 
 ## Multi-functional HID Device Support
 
-Starting from this version, the library supports creating a **multi-functional HID device** that combines gamepad, keyboard, and mouse functionality in a single BLE connection. This means your ESP32-C3 can act as all three input devices simultaneously.
+Starting from this version, the library supports creating a **multi-functional HID device** that combines Controller, keyboard, and mouse functionality in a single BLE connection. This means your ESP32-C3 can act as all three input devices simultaneously.
 
 ### Features:
-- **Gamepad**: All existing gamepad functionality (buttons, axes, triggers, hats, etc.)
+- **Controller**: All existing Controller functionality (buttons, axes, triggers, hats, etc.)
 - **Keyboard**: Full keyboard support with modifier keys, function keys, and text input
 - **Mouse**: Mouse buttons (left, right, middle), movement, and scroll wheel
 - **Combined Usage**: Use all three input types at the same time
@@ -256,7 +245,7 @@ void setup() {
 
 void loop() {
   if (bleDevice.isConnected()) {
-    // Use gamepad
+    // Use Controller
     bleDevice.press(BUTTON_1);
     bleDevice.setLeftThumb(16000, 8000);
     bleDevice.sendReport();
@@ -278,7 +267,7 @@ void loop() {
 - `MultiFunctionalHID.ino` - Advanced usage with all features demonstrated
 
 This multi-HID functionality is particularly useful for:
-- **Gaming applications** where you need gamepad controls plus keyboard shortcuts
+- **Gaming applications** where you need Controller controls plus keyboard shortcuts
 - **Accessibility devices** that combine multiple input methods
 - **Remote control applications** with comprehensive input capabilities
 - **Creative/productivity tools** that benefit from multiple input modalities

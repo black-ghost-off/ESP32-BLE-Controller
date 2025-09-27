@@ -17,7 +17,7 @@ void setup()
   Serial.println("Starting BLE work!");
 
   BleControllerConfig.setAutoReport(false);
-  BleControllerConfig.setControllerType(CONTROLLER_TYPE_GAMEPAD); // CONTROLLER_TYPE_JOYSTICK, CONTROLLER_TYPE_GAMEPAD (DEFAULT), CONTROLLER_TYPE_MULTI_AXIS
+  BleControllerConfig.setControllerType(CONTROLLER_TYPE_CONTROLLER); // CONTROLLER_TYPE_JOYSTICK, CONTROLLER_TYPE_CONTROLLER (DEFAULT), CONTROLLER_TYPE_MULTI_AXIS
 
   BleControllerConfig.setEnableOutputReport(true);   // (Necessary) Enable Output Report. Default is false. 
   BleControllerConfig.setOutputReportLength(128);  // (Optional) Set Report Length 128(Bytes). The default value is 64 bytes.

@@ -1,6 +1,6 @@
 #include "BleControllerConfiguration.h"
 
-BleControllerConfiguration::BleControllerConfiguration() : _controllerType(CONTROLLER_TYPE_GAMEPAD),
+BleControllerConfiguration::BleControllerConfiguration() : _controllerType(CONTROLLER_TYPE_CONTROLLER),
                                                      _autoReport(true),
                                                      _hidReportId(3),
                                                      _buttonCount(16),

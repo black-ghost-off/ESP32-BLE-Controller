@@ -1,5 +1,5 @@
 /*
- * This code programs a number of pins on an ESP32 as buttons on a BLE gamepad
+ * This code programs a number of pins on an ESP32 as buttons on a BLE Controller
  *
  * It uses arrays to cut down on code
  *
@@ -15,7 +15,7 @@
 
 #include <Arduino.h>
 #include <Bounce2.h>    // https://github.com/thomasfredericks/Bounce2
-#include <BleController.h> // https://github.com/lemmingDev/ESP32-BLE-Gamepad
+#include <BleController.h> // https://github.com/lemmingDev/ESP32-BLE-Controller
 
 #define numOfButtons 10
 

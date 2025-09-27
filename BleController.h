@@ -1,5 +1,5 @@
-#ifndef ESP32_BLE_GAMEPAD_H
-#define ESP32_BLE_GAMEPAD_H
+#ifndef ESP32_BLE_CONTROLLER_H
+#define ESP32_BLE_CONTROLLER_H
 #include "sdkconfig.h"
 #if defined(CONFIG_BT_ENABLED)
 #include "nimconfig.h"
@@ -13,12 +13,12 @@
 #include "NimBLEHIDDevice.h"
 
 // Debug enabled, disabled by default
-#ifndef BLE_GAMEPAD_DEBUG
-#define BLE_GAMEPAD_DEBUG 0
+#ifndef BLE_CONTROLLER_DEBUG
+#define BLE_CONTROLLER_DEBUG 0
 #endif
 
 // Report IDs for multi-functional HID device
-#define GAMEPAD_REPORT_ID 0x01
+#define CONTROLLER_REPORT_ID 0x01
 #define KEYBOARD_REPORT_ID 0x02
 #define MOUSE_REPORT_ID 0x03
 
@@ -107,7 +107,7 @@ private:
   NimBLECharacteristic *inputController;
   NimBLECharacteristic *inputKeyboard;
   NimBLECharacteristic *inputMouse;
-  NimBLECharacteristic *outputGamepad;
+  NimBLECharacteristic *outputController;
   NimBLECharacteristic *pCharacteristic_Power_State;
 
   uint8_t *outputBackupBuffer;
@@ -121,7 +121,7 @@ public:
   void rawMouseAction(uint8_t msg[], char msgSize);
   BleControllerConfiguration configuration;
 
-  BleController(std::string deviceName = "ESP32 BLE Gamepad",
+  BleController(std::string deviceName = "ESP32 BLE Controller",
              std::string deviceManufacturer = "Espressif",
              uint8_t batteryLevel = 100, bool delayAdvertising = false);
   void begin(BleControllerConfiguration *config = new BleControllerConfiguration());
@@ -248,4 +248,4 @@ bool needsShift(char ascii);
 
 #endif // CONFIG_BT_NIMBLE_ROLE_PERIPHERAL
 #endif // CONFIG_BT_ENABLED
-#endif // ESP32_BLE_GAMEPAD_H
+#endif // ESP32_BLE_CONTROLLER_H

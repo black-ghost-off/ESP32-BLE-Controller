@@ -21,7 +21,7 @@
 #define enableBrake true
 #define enableSteering true
 
-//int16_t simMin = 0x8000;      // -32767 --> Some non-Windows operating systems and web based gamepad testers don't like min axis set below 0, so 0 is set by default
+//int16_t simMin = 0x8000;      // -32767 --> Some non-Windows operating systems and web based Controller testers don't like min axis set below 0, so 0 is set by default
 //int16_t axesCenter = 0x00;      
 int16_t simMin = 0x00;        // Set simulation minimum axes to zero.
 int16_t axesCenter = 0x3FFF;
@@ -39,7 +39,7 @@ void setup()
     // Setup controller with 10 buttons, accelerator, brake and steering
     BleControllerConfiguration BleControllerConfig;
     BleControllerConfig.setAutoReport(false);
-    BleControllerConfig.setControllerType(CONTROLLER_TYPE_GAMEPAD); // CONTROLLER_TYPE_JOYSTICK, CONTROLLER_TYPE_GAMEPAD (DEFAULT), CONTROLLER_TYPE_MULTI_AXIS
+    BleControllerConfig.setControllerType(CONTROLLER_TYPE_CONTROLLER); // CONTROLLER_TYPE_JOYSTICK, CONTROLLER_TYPE_CONTROLLER (DEFAULT), CONTROLLER_TYPE_MULTI_AXIS
     BleControllerConfig.setButtonCount(numOfButtons);
     BleControllerConfig.setWhichAxes(enableX, enableY, enableZ, enableRX, enableRY, enableRZ, enableSlider1, enableSlider2);      // Can also be done per-axis individually. All are true by default
     BleControllerConfig.setWhichSimulationControls(enableRudder, enableThrottle, enableAccelerator, enableBrake, enableSteering); // Can also be done per-control individually. All are false by default

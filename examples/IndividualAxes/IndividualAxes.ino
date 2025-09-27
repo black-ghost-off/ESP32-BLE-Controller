@@ -1,8 +1,8 @@
 /*
- * This example turns the ESP32 into a Bluetooth LE gamepad that presses buttons and moves axis
+ * This example turns the ESP32 into a Bluetooth LE Controller that presses buttons and moves axis
  *
  * Possible buttons are:
- * BUTTON_1 through to BUTTON_128 (Windows gamepad tester only visualises the first 32)
+ * BUTTON_1 through to BUTTON_128 (Windows Controller tester only visualises the first 32)
  ^ Use http://www.planetpointy.co.uk/joystick-test-application/ to visualise all of them
  * Whenever you adjust the amount of buttons/axes etc, make sure you unpair and repair the BLE device
  *
@@ -44,7 +44,7 @@ void setup()
     BleControllerConfig.setAutoReport(false); // This is true by default
     BleControllerConfig.setButtonCount(128);
     BleControllerConfig.setHatSwitchCount(2);
-    BleController.begin(&BleControllerConfig); // Creates a gamepad with 128 buttons, 2 hat switches and x, y, z, rZ, rX, rY and 2 sliders (no simulation controls enabled by default)
+    BleController.begin(&BleControllerConfig); // Creates a Controller with 128 buttons, 2 hat switches and x, y, z, rZ, rX, rY and 2 sliders (no simulation controls enabled by default)
 
     // Changing BleControllerConfig after the begin function has no effect, unless you call the begin function again
 }
@@ -74,7 +74,7 @@ void loop()
         BleController.setHat2(DPAD_UP_LEFT);    // or BleController.setHat2(HAT_UP_LEFT);
         // Or BleController.setHats(DPAD_DOWN_RIGHT, DPAD_UP_LEFT);
 
-        // Send the gamepad report
+        // Send the Controller report
         BleController.sendReport();
         delay(500);
 

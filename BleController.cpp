@@ -46,7 +46,10 @@ static const char *LOG_TAG = "BleController";
 #define POWER_STATE_CHARGING 3        // 0b11
 #define POWER_STATE_CRITICAL 3        // 0b11
 
-#if BLE_GAMEPAD_DEBUG == 1
+// BLE Appearance constants
+#define HID_CONTROLLER 0x03C0  // Bluetooth SIG Appearance value for HID Controller/Gamepad
+
+#if BLE_CONTROLLER_DEBUG == 1
 static void dumpHIDReport(const uint8_t *report, size_t len);
 #endif
 
@@ -128,7 +131,7 @@ void BleController::begin(BleControllerConfiguration *config) {
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x05;
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x01;
 
-  // USAGE (Joystick - 0x04; Gamepad - 0x05; Multi-axis Controller - 0x08)
+  // USAGE (Joystick - 0x04; Controller - 0x05; Multi-axis Controller - 0x08)
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x09;
   tempHidReportDescriptor[hidReportDescriptorSize++] =
       configuration.getControllerType();
@@ -731,7 +734,7 @@ void BleController::begin(BleControllerConfiguration *config) {
     tempHidReportDescriptor[hidReportDescriptorSize++] = 0x02;
   }
 
-  // END_COLLECTION (Application) - End gamepad collection
+  // END_COLLECTION (Application) - End Controller collection
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0xc0;
 
   // =================== KEYBOARD DESCRIPTOR ===================
@@ -1211,7 +1214,7 @@ void BleController::sendReport(void) {
       }
     }
 
-#if BLE_GAMEPAD_DEBUG == 1
+#if BLE_CONTROLLER_DEBUG == 1
     dumpHIDReport(m, sizeof(m));
 #endif
 
@@ -1936,7 +1939,7 @@ void BleController::setPowerLevel(uint8_t powerLevel) {
                    _powerLevel);
 }
 
-#if BLE_GAMEPAD_DEBUG == 1
+#if BLE_CONTROLLER_DEBUG == 1
 static void dumpHidReportDescriptor(const uint8_t *desc, size_t size) {
   if (!Serial) {
     // Serial not initialized yet, avoid printing
@@ -2052,14 +2055,14 @@ void BleController::taskServer(void *pvParameter) {
       BleControllerInstance->hid->getInputReport(MOUSE_REPORT_ID);
 
   if (BleControllerInstance->enableOutputReport) {
-    BleControllerInstance->outputGamepad =
+    BleControllerInstance->outputController =
         BleControllerInstance->hid->getOutputReport(
             BleControllerInstance->configuration.getHidReportId());
     BleControllerInstance->outputReceiver =
         new BleOutputReceiver(BleControllerInstance->outputReportLength);
     BleControllerInstance->outputBackupBuffer =
         new uint8_t[BleControllerInstance->outputReportLength];
-    BleControllerInstance->outputGamepad->setCallbacks(
+    BleControllerInstance->outputController->setCallbacks(
         BleControllerInstance->outputReceiver);
   }
 
@@ -2124,7 +2127,7 @@ void BleController::taskServer(void *pvParameter) {
   memcpy(customHidReportDescriptor, BleControllerInstance->tempHidReportDescriptor,
          BleControllerInstance->hidReportDescriptorSize);
 
-#if BLE_GAMEPAD_DEBUG == 1
+#if BLE_CONTROLLER_DEBUG == 1
   // Print HidReportDescriptor to Serial
   dumpHidReportDescriptor(BleControllerInstance->tempHidReportDescriptor,
                           BleControllerInstance->hidReportDescriptorSize);
@@ -2138,7 +2141,7 @@ void BleController::taskServer(void *pvParameter) {
   BleControllerInstance->onStarted(pServer);
 
   NimBLEAdvertising *pAdvertising = pServer->getAdvertising();
-  pAdvertising->setAppearance(HID_GAMEPAD);
+  pAdvertising->setAppearance(HID_CONTROLLER);
   pAdvertising->setName(BleControllerInstance->deviceName);
   pAdvertising->addServiceUUID(
       BleControllerInstance->hid->getHidService()->getUUID());
@@ -2255,7 +2258,7 @@ void BleController::sendKeyboardReport() {
   this->inputKeyboard->setValue(report, sizeof(report));
   this->inputKeyboard->notify();
 
-#if BLE_GAMEPAD_DEBUG == 1
+#if BLE_CONTROLLER_DEBUG == 1
   dumpHIDReport(report, sizeof(report));
 #endif
 }
@@ -2267,7 +2270,7 @@ void BleController::rawKeyboardAction(uint8_t msg[], char msgSize) {
   this->inputKeyboard->setValue(msg, msgSize);
   this->inputKeyboard->notify();
 
-#if BLE_GAMEPAD_DEBUG == 1
+#if BLE_CONTROLLER_DEBUG == 1
   dumpHIDReport(msg, msgSize);
 #endif
 }
@@ -2342,7 +2345,7 @@ void BleController::sendMouseReport() {
   this->inputMouse->setValue(report, sizeof(report));
   this->inputMouse->notify();
 
-#if BLE_GAMEPAD_DEBUG == 1
+#if BLE_CONTROLLER_DEBUG == 1
   dumpHIDReport(report, sizeof(report));
 #endif
 }
@@ -2354,7 +2357,7 @@ void BleController::rawMouseAction(uint8_t msg[], char msgSize) {
   this->inputMouse->setValue(msg, msgSize);
   this->inputMouse->notify();
 
-#if BLE_GAMEPAD_DEBUG == 1
+#if BLE_CONTROLLER_DEBUG == 1
   dumpHIDReport(msg, msgSize);
 #endif
 }

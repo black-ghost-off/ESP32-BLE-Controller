@@ -31,14 +31,14 @@ void setup()
     // Setup controller with 16 buttons (plus start and select), accelerator, brake and steering
     BleControllerConfiguration BleControllerConfig;
     BleControllerConfig.setAutoReport(false);
-    BleControllerConfig.setControllerType(CONTROLLER_TYPE_MULTI_AXIS); // CONTROLLER_TYPE_JOYSTICK, CONTROLLER_TYPE_GAMEPAD (DEFAULT), CONTROLLER_TYPE_MULTI_AXIS
+    BleControllerConfig.setControllerType(CONTROLLER_TYPE_MULTI_AXIS); // CONTROLLER_TYPE_JOYSTICK, CONTROLLER_TYPE_CONTROLLER (DEFAULT), CONTROLLER_TYPE_MULTI_AXIS
     BleControllerConfig.setButtonCount(numOfButtons);
     BleControllerConfig.setIncludeStart(true);
     BleControllerConfig.setIncludeSelect(true);
     BleControllerConfig.setWhichAxes(enableX, enableY, enableZ, enableRX, enableRY, enableRZ, enableSlider1, enableSlider2);      // Can also be done per-axis individually. All are true by default
     BleControllerConfig.setWhichSimulationControls(enableRudder, enableThrottle, enableAccelerator, enableBrake, enableSteering); // Can also be done per-control individually. All are false by default
     BleControllerConfig.setHatSwitchCount(numOfHatSwitches);                                                                      // 1 by default
-    // Some non-Windows operating systems and web based gamepad testers don't like min axis set below 0, so 0 is set by default
+    // Some non-Windows operating systems and web based Controller testers don't like min axis set below 0, so 0 is set by default
     BleControllerConfig.setAxesMin(0x8001); // -32767 --> int16_t - 16 bit signed integer - Can be in decimal or hexadecimal
     BleControllerConfig.setAxesMax(0x7FFF); // 32767 --> int16_t - 16 bit signed integer - Can be in decimal or hexadecimal 
     // Shows how simulation control min/max axes can be set independently of the other axes
