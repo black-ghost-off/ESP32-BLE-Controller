@@ -1,6 +1,6 @@
 {
     "name": "ESP32-BLE-Controller",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "description": "BLE Bluetooth HID Controller library for ESP32 with multi-functional HID device support (Controller + Keyboard + Mouse)",
     "keywords": [
         "bluetooth",
