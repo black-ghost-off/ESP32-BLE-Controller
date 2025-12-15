@@ -47,14 +47,16 @@ static const char *LOG_TAG = "BleController";
 #define POWER_STATE_CRITICAL 3        // 0b11
 
 // BLE Appearance constants
-#define HID_CONTROLLER 0x03C0  // Bluetooth SIG Appearance value for HID Controller/Gamepad
+#define HID_CONTROLLER                                                         \
+  0x03C0 // Bluetooth SIG Appearance value for HID Controller/Gamepad
 
 #if BLE_CONTROLLER_DEBUG == 1
 static void dumpHIDReport(const uint8_t *report, size_t len);
 #endif
 
-BleController::BleController(std::string deviceName, std::string deviceManufacturer,
-                       uint8_t batteryLevel, bool delayAdvertising)
+BleController::BleController(std::string deviceName,
+                             std::string deviceManufacturer,
+                             uint8_t batteryLevel, bool delayAdvertising)
     : _buttons(), _specialButtons(0), _x(0), _y(0), _z(0), _rX(0), _rY(0),
       _rZ(0), _slider1(0), _slider2(0), _rudder(0), _throttle(0),
       _accelerator(0), _brake(0), _steering(0), _hat1(0), _hat2(0), _hat3(0),
@@ -834,6 +836,10 @@ void BleController::begin(BleControllerConfiguration *config) {
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0xc0;
 
   // =================== MOUSE DESCRIPTOR ===================
+  // Based on ESP32-NimBLE-Mouse reference implementation
+  // Report format: buttons(1 byte) + X(1) + Y(1) + wheel(1) + hWheel(1) = 5
+  // bytes
+
   // USAGE_PAGE (Generic Desktop)
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x05;
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x01;
@@ -858,6 +864,7 @@ void BleController::begin(BleControllerConfiguration *config) {
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x85;
   tempHidReportDescriptor[hidReportDescriptorSize++] = MOUSE_REPORT_ID;
 
+  // ---- Buttons (5 buttons + 3 bit padding = 1 byte) ----
   // USAGE_PAGE (Button)
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x05;
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x09;
@@ -866,9 +873,9 @@ void BleController::begin(BleControllerConfiguration *config) {
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x19;
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x01;
 
-  // USAGE_MAXIMUM (Button 3)
+  // USAGE_MAXIMUM (Button 5)
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x29;
-  tempHidReportDescriptor[hidReportDescriptorSize++] = 0x03;
+  tempHidReportDescriptor[hidReportDescriptorSize++] = 0x05;
 
   // LOGICAL_MINIMUM (0)
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x15;
@@ -878,30 +885,31 @@ void BleController::begin(BleControllerConfiguration *config) {
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x25;
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x01;
 
-  // REPORT_COUNT (3)
-  tempHidReportDescriptor[hidReportDescriptorSize++] = 0x95;
-  tempHidReportDescriptor[hidReportDescriptorSize++] = 0x03;
-
   // REPORT_SIZE (1)
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x75;
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x01;
 
-  // INPUT (Data,Var,Abs)
+  // REPORT_COUNT (5) - 5 button bits
+  tempHidReportDescriptor[hidReportDescriptorSize++] = 0x95;
+  tempHidReportDescriptor[hidReportDescriptorSize++] = 0x05;
+
+  // INPUT (Data,Var,Abs) - 5 button bits
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x81;
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x02;
 
-  // REPORT_COUNT (1) - Padding
+  // REPORT_SIZE (3) - 3 bit padding
+  tempHidReportDescriptor[hidReportDescriptorSize++] = 0x75;
+  tempHidReportDescriptor[hidReportDescriptorSize++] = 0x03;
+
+  // REPORT_COUNT (1)
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x95;
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x01;
-
-  // REPORT_SIZE (5)
-  tempHidReportDescriptor[hidReportDescriptorSize++] = 0x75;
-  tempHidReportDescriptor[hidReportDescriptorSize++] = 0x05;
 
   // INPUT (Const,Var,Abs) - Padding
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x81;
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x03;
 
+  // ---- X/Y (2 bytes) ----
   // USAGE_PAGE (Generic Desktop)
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x05;
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x01;
@@ -926,17 +934,48 @@ void BleController::begin(BleControllerConfiguration *config) {
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x75;
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x08;
 
-  // REPORT_COUNT (2)
+  // REPORT_COUNT (2) - X and Y only
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x95;
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x02;
 
-  // INPUT (Data,Var,Rel)
+  // INPUT (Data,Var,Rel) - Relative movement
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x81;
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x06;
 
+  // ---- Vertical Wheel (1 byte) ----
   // USAGE (Wheel)
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x09;
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x38;
+
+  // LOGICAL_MINIMUM (-127)
+  tempHidReportDescriptor[hidReportDescriptorSize++] = 0x15;
+  tempHidReportDescriptor[hidReportDescriptorSize++] = 0x81;
+
+  // LOGICAL_MAXIMUM (127)
+  tempHidReportDescriptor[hidReportDescriptorSize++] = 0x25;
+  tempHidReportDescriptor[hidReportDescriptorSize++] = 0x7f;
+
+  // REPORT_SIZE (8)
+  tempHidReportDescriptor[hidReportDescriptorSize++] = 0x75;
+  tempHidReportDescriptor[hidReportDescriptorSize++] = 0x08;
+
+  // REPORT_COUNT (1) - Wheel only
+  tempHidReportDescriptor[hidReportDescriptorSize++] = 0x95;
+  tempHidReportDescriptor[hidReportDescriptorSize++] = 0x01;
+
+  // INPUT (Data,Var,Rel) - Relative movement
+  tempHidReportDescriptor[hidReportDescriptorSize++] = 0x81;
+  tempHidReportDescriptor[hidReportDescriptorSize++] = 0x06;
+
+  // ---- Horizontal Wheel (1 byte) ----
+  // USAGE_PAGE (Consumer Devices)
+  tempHidReportDescriptor[hidReportDescriptorSize++] = 0x05;
+  tempHidReportDescriptor[hidReportDescriptorSize++] = 0x0c;
+
+  // USAGE (AC Pan)
+  tempHidReportDescriptor[hidReportDescriptorSize++] = 0x0a;
+  tempHidReportDescriptor[hidReportDescriptorSize++] = 0x38;
+  tempHidReportDescriptor[hidReportDescriptorSize++] = 0x02;
 
   // LOGICAL_MINIMUM (-127)
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x15;
@@ -971,49 +1010,7 @@ void BleController::begin(BleControllerConfiguration *config) {
 void BleController::end(void) {}
 
 void BleController::setAxes(int16_t x, int16_t y, int16_t z, int16_t rX,
-                         int16_t rY, int16_t rZ, int16_t slider1,
-                         int16_t slider2) {
-  if (x == -32768) {
-    x = -32767;
-  }
-  if (y == -32768) {
-    y = -32767;
-  }
-  if (z == -32768) {
-    z = -32767;
-  }
-  if (rZ == -32768) {
-    rZ = -32767;
-  }
-  if (rX == -32768) {
-    rX = -32767;
-  }
-  if (rY == -32768) {
-    rY = -32767;
-  }
-  if (slider1 == -32768) {
-    slider1 = -32767;
-  }
-  if (slider2 == -32768) {
-    slider2 = -32767;
-  }
-
-  _x = x;
-  _y = y;
-  _z = z;
-  _rZ = rZ;
-  _rX = rX;
-  _rY = rY;
-  _slider1 = slider1;
-  _slider2 = slider2;
-
-  if (configuration.getAutoReport()) {
-    sendReport();
-  }
-}
-
-void BleController::setHIDAxes(int16_t x, int16_t y, int16_t z, int16_t rZ,
-                            int16_t rX, int16_t rY, int16_t slider1,
+                            int16_t rY, int16_t rZ, int16_t slider1,
                             int16_t slider2) {
   if (x == -32768) {
     x = -32767;
@@ -1054,9 +1051,51 @@ void BleController::setHIDAxes(int16_t x, int16_t y, int16_t z, int16_t rZ,
   }
 }
 
+void BleController::setHIDAxes(int16_t x, int16_t y, int16_t z, int16_t rZ,
+                               int16_t rX, int16_t rY, int16_t slider1,
+                               int16_t slider2) {
+  if (x == -32768) {
+    x = -32767;
+  }
+  if (y == -32768) {
+    y = -32767;
+  }
+  if (z == -32768) {
+    z = -32767;
+  }
+  if (rZ == -32768) {
+    rZ = -32767;
+  }
+  if (rX == -32768) {
+    rX = -32767;
+  }
+  if (rY == -32768) {
+    rY = -32767;
+  }
+  if (slider1 == -32768) {
+    slider1 = -32767;
+  }
+  if (slider2 == -32768) {
+    slider2 = -32767;
+  }
+
+  _x = x;
+  _y = y;
+  _z = z;
+  _rZ = rZ;
+  _rX = rX;
+  _rY = rY;
+  _slider1 = slider1;
+  _slider2 = slider2;
+
+  if (configuration.getAutoReport()) {
+    sendReport();
+  }
+}
+
 void BleController::setSimulationControls(int16_t rudder, int16_t throttle,
-                                       int16_t accelerator, int16_t brake,
-                                       int16_t steering) {
+                                          int16_t accelerator, int16_t brake,
+                                          int16_t steering) {
   if (rudder == -32768) {
     rudder = -32767;
   }
@@ -1084,8 +1123,8 @@ void BleController::setSimulationControls(int16_t rudder, int16_t throttle,
   }
 }
 
-void BleController::setHats(signed char hat1, signed char hat2, signed char hat3,
-                         signed char hat4) {
+void BleController::setHats(signed char hat1, signed char hat2,
+                            signed char hat3, signed char hat4) {
   _hat1 = hat1;
   _hat2 = hat2;
   _hat3 = hat3;
@@ -1321,13 +1360,19 @@ void BleController::releaseBack() { releaseSpecialButton(BACK_BUTTON); }
 
 void BleController::pressVolumeInc() { pressSpecialButton(VOLUME_INC_BUTTON); }
 
-void BleController::releaseVolumeInc() { releaseSpecialButton(VOLUME_INC_BUTTON); }
+void BleController::releaseVolumeInc() {
+  releaseSpecialButton(VOLUME_INC_BUTTON);
+}
 
 void BleController::pressVolumeDec() { pressSpecialButton(VOLUME_DEC_BUTTON); }
 
-void BleController::releaseVolumeDec() { releaseSpecialButton(VOLUME_DEC_BUTTON); }
+void BleController::releaseVolumeDec() {
+  releaseSpecialButton(VOLUME_DEC_BUTTON);
+}
 
-void BleController::pressVolumeMute() { pressSpecialButton(VOLUME_MUTE_BUTTON); }
+void BleController::pressVolumeMute() {
+  pressSpecialButton(VOLUME_MUTE_BUTTON);
+}
 
 void BleController::releaseVolumeMute() {
   releaseSpecialButton(VOLUME_MUTE_BUTTON);
@@ -1639,7 +1684,9 @@ bool BleController::isPressed(uint8_t b) {
   return false;
 }
 
-bool BleController::isConnected(void) { return this->connectionStatus->connected; }
+bool BleController::isConnected(void) {
+  return this->connectionStatus->connected;
+}
 
 void BleController::setBatteryLevel(uint8_t level) {
   this->batteryLevel = level;
@@ -1844,7 +1891,7 @@ void BleController::setAccelerometer(int16_t aX, int16_t aY, int16_t aZ) {
 }
 
 void BleController::setMotionControls(int16_t gX, int16_t gY, int16_t gZ,
-                                   int16_t aX, int16_t aY, int16_t aZ) {
+                                      int16_t aX, int16_t aY, int16_t aZ) {
   if (gX == -32768) {
     gX = -32767;
   }
@@ -1882,8 +1929,9 @@ void BleController::setMotionControls(int16_t gX, int16_t gY, int16_t gZ,
 }
 
 void BleController::setPowerStateAll(uint8_t batteryPowerInformation,
-                                  uint8_t dischargingState,
-                                  uint8_t chargingState, uint8_t powerLevel) {
+                                     uint8_t dischargingState,
+                                     uint8_t chargingState,
+                                     uint8_t powerLevel) {
   uint8_t powerStateBits = 0b00000000;
 
   _batteryPowerInformation = batteryPowerInformation;
@@ -1915,7 +1963,8 @@ void BleController::setPowerStateAll(uint8_t batteryPowerInformation,
   }
 }
 
-void BleController::setBatteryPowerInformation(uint8_t batteryPowerInformation) {
+void BleController::setBatteryPowerInformation(
+    uint8_t batteryPowerInformation) {
   _batteryPowerInformation = batteryPowerInformation;
   setPowerStateAll(_batteryPowerInformation, _dischargingState, _chargingState,
                    _powerLevel);
@@ -2028,8 +2077,8 @@ void BleController::setNUSDataReceivedCallback(
 }
 
 void BleController::taskServer(void *pvParameter) {
-  BleController *BleControllerInstance =
-      (BleController *)pvParameter; // static_cast<BleController *>(pvParameter);
+  BleController *BleControllerInstance = (BleController *)
+      pvParameter; // static_cast<BleController *>(pvParameter);
 
   NimBLEDevice::init(BleControllerInstance->deviceName);
   NimBLEDevice::setPower(
@@ -2037,14 +2086,16 @@ void BleController::taskServer(void *pvParameter) {
           .getTXPowerLevel()); // Set transmit power for advertising (Range: -12
                                // to +9 dBm)
   NimBLEServer *pServer = NimBLEDevice::createServer();
+
   pServer->setCallbacks(BleControllerInstance->connectionStatus);
   pServer->advertiseOnDisconnect(true);
 
   BleControllerInstance->hid = new NimBLEHIDDevice(pServer);
 
-  BleControllerInstance->inputController = BleControllerInstance->hid->getInputReport(
-      BleControllerInstance->configuration
-          .getHidReportId()); // <-- input REPORTID from report map
+  BleControllerInstance->inputController =
+      BleControllerInstance->hid->getInputReport(
+          BleControllerInstance->configuration
+              .getHidReportId()); // <-- input REPORTID from report map
   BleControllerInstance->connectionStatus->inputController =
       BleControllerInstance->inputController;
 
@@ -2124,7 +2175,8 @@ void BleController::taskServer(void *pvParameter) {
 
   uint8_t *customHidReportDescriptor =
       new uint8_t[BleControllerInstance->hidReportDescriptorSize];
-  memcpy(customHidReportDescriptor, BleControllerInstance->tempHidReportDescriptor,
+  memcpy(customHidReportDescriptor,
+         BleControllerInstance->tempHidReportDescriptor,
          BleControllerInstance->hidReportDescriptorSize);
 
 #if BLE_CONTROLLER_DEBUG == 1
@@ -2154,12 +2206,39 @@ void BleController::taskServer(void *pvParameter) {
     pAdvertising->start();
   }
 
-  BleControllerInstance->hid->setBatteryLevel(BleControllerInstance->batteryLevel);
+  BleControllerInstance->hid->setBatteryLevel(
+      BleControllerInstance->batteryLevel);
 
   vTaskDelay(portMAX_DELAY); // delay(portMAX_DELAY);
 }
 
 // ===================== KEYBOARD METHODS =====================
+// Completely rewritten for reliable operation
+// Based on ESP32-NimBLE-Keyboard reference implementation
+
+// Internal helper: send a raw keyboard HID report
+// Report format: 8 bytes (NO report ID - NimBLE adds it internally)
+// [modifiers, reserved, key1, key2, key3, key4, key5, key6]
+void BleController::sendRawKeyboard(uint8_t modifiers, uint8_t key1,
+                                    uint8_t key2, uint8_t key3, uint8_t key4,
+                                    uint8_t key5, uint8_t key6) {
+  if (!this->isConnected())
+    return;
+
+  // 8 bytes: modifiers + reserved + 6 keys (NO report ID!)
+  uint8_t report[8];
+  report[0] = modifiers;
+  report[1] = 0x00; // Reserved
+  report[2] = key1;
+  report[3] = key2;
+  report[4] = key3;
+  report[5] = key4;
+  report[6] = key5;
+  report[7] = key6;
+
+  this->inputKeyboard->setValue(report, sizeof(report));
+  this->inputKeyboard->notify();
+}
 
 void BleController::keyboardPress(uint8_t key) {
   if (!this->isConnected())
@@ -2201,14 +2280,41 @@ void BleController::keyboardReleaseAll() {
   if (!this->isConnected())
     return;
 
+  // Zero out everything and send
   memset(&_keyboardReport, 0, sizeof(_keyboardReport));
-  sendKeyboardReport();
+  sendRawKeyboard(0, 0, 0, 0, 0, 0, 0);
 }
 
+// Type a single HID key code (press and release)
 void BleController::keyboardWrite(uint8_t key) {
-  keyboardPress(key);
-  delay(10);
-  keyboardRelease(key);
+  if (!this->isConnected())
+    return;
+
+  // Press
+  sendRawKeyboard(0, key, 0, 0, 0, 0, 0);
+  delay(15);
+  // Release
+  sendRawKeyboard(0, 0, 0, 0, 0, 0, 0);
+  delay(15);
+}
+
+// Type a single character with proper shift handling
+void BleController::typeChar(char c) {
+  if (!this->isConnected())
+    return;
+
+  uint8_t hidKey = asciiToHID(c);
+  if (hidKey == 0)
+    return;
+
+  uint8_t modifier = needsShift(c) ? KEY_MOD_LSHIFT : 0;
+
+  // Press key with modifier
+  sendRawKeyboard(modifier, hidKey, 0, 0, 0, 0, 0);
+  delay(15);
+  // Release everything
+  sendRawKeyboard(0, 0, 0, 0, 0, 0, 0);
+  delay(15);
 }
 
 void BleController::keyboardWrite(const char *str) {
@@ -2216,24 +2322,7 @@ void BleController::keyboardWrite(const char *str) {
     return;
 
   for (int i = 0; str[i] != '\0'; i++) {
-    char c = str[i];
-    uint8_t hidKey = asciiToHID(c);
-
-    if (hidKey != 0) {
-      if (needsShift(c)) {
-        _keyboardReport.modifiers |= KEY_MOD_LSHIFT;
-      }
-
-      _keyboardReport.keys[0] = hidKey;
-      sendKeyboardReport();
-      delay(10);
-
-      // Release key and modifier
-      _keyboardReport.keys[0] = 0;
-      _keyboardReport.modifiers = 0;
-      sendKeyboardReport();
-      delay(10);
-    }
+    typeChar(str[i]);
   }
 }
 
@@ -2243,24 +2332,17 @@ void BleController::keyboardPrint(String str) { keyboardWrite(str.c_str()); }
 
 void BleController::setKeyboardModifiers(uint8_t modifiers) {
   _keyboardReport.modifiers = modifiers;
+  sendKeyboardReport();
 }
 
 void BleController::sendKeyboardReport() {
   if (!this->isConnected())
     return;
 
-  uint8_t report[9];
-  report[0] = KEYBOARD_REPORT_ID;
-  report[1] = _keyboardReport.modifiers;
-  report[2] = _keyboardReport.reserved;
-  memcpy(&report[3], _keyboardReport.keys, 6);
-
-  this->inputKeyboard->setValue(report, sizeof(report));
-  this->inputKeyboard->notify();
-
-#if BLE_CONTROLLER_DEBUG == 1
-  dumpHIDReport(report, sizeof(report));
-#endif
+  sendRawKeyboard(_keyboardReport.modifiers, _keyboardReport.keys[0],
+                  _keyboardReport.keys[1], _keyboardReport.keys[2],
+                  _keyboardReport.keys[3], _keyboardReport.keys[4],
+                  _keyboardReport.keys[5]);
 }
 
 void BleController::rawKeyboardAction(uint8_t msg[], char msgSize) {
@@ -2269,18 +2351,41 @@ void BleController::rawKeyboardAction(uint8_t msg[], char msgSize) {
 
   this->inputKeyboard->setValue(msg, msgSize);
   this->inputKeyboard->notify();
-
-#if BLE_CONTROLLER_DEBUG == 1
-  dumpHIDReport(msg, msgSize);
-#endif
 }
 
 // ===================== MOUSE METHODS =====================
+// Based on ESP32-NimBLE-Mouse reference implementation
+// Report format: [buttons, x, y, wheel, hWheel] = 5 bytes
+// NimBLE adds Report ID internally for getInputReport(REPORT_ID)
+
+void BleController::sendRawMouse(uint8_t buttons, int8_t x, int8_t y,
+                                 int8_t wheel) {
+  if (!this->isConnected())
+    return;
+
+  // 5 bytes only - NO Report ID (NimBLE adds it internally)
+  // Format: [buttons, x, y, wheel, hWheel]
+  uint8_t m[5];
+  m[0] = buttons;
+  m[1] = x;
+  m[2] = y;
+  m[3] = wheel;
+  m[4] = 0; // Horizontal wheel (not used)
+
+  this->inputMouse->setValue(m, 5);
+  this->inputMouse->notify();
+}
 
 void BleController::mouseClick(uint8_t button) {
-  mousePress(button);
-  delay(10);
-  mouseRelease(button);
+  if (!this->isConnected())
+    return;
+
+  // Press
+  sendRawMouse(button, 0, 0, 0);
+  delay(15);
+  // Release
+  sendRawMouse(0, 0, 0, 0);
+  delay(15);
 }
 
 void BleController::mousePress(uint8_t button) {
@@ -2288,7 +2393,7 @@ void BleController::mousePress(uint8_t button) {
     return;
 
   _mouseReport.buttons |= button;
-  sendMouseReport();
+  sendRawMouse(_mouseReport.buttons, 0, 0, 0);
 }
 
 void BleController::mouseRelease(uint8_t button) {
@@ -2296,7 +2401,7 @@ void BleController::mouseRelease(uint8_t button) {
     return;
 
   _mouseReport.buttons &= ~button;
-  sendMouseReport();
+  sendRawMouse(_mouseReport.buttons, 0, 0, 0);
 }
 
 void BleController::mouseReleaseAll() {
@@ -2304,50 +2409,33 @@ void BleController::mouseReleaseAll() {
     return;
 
   _mouseReport.buttons = 0;
-  sendMouseReport();
+  _mouseReport.x = 0;
+  _mouseReport.y = 0;
+  _mouseReport.wheel = 0;
+  sendRawMouse(0, 0, 0, 0);
 }
 
 void BleController::mouseMove(int8_t x, int8_t y) {
   if (!this->isConnected())
     return;
 
-  _mouseReport.x = x;
-  _mouseReport.y = y;
-  sendMouseReport();
-
-  // Reset movement after sending
-  _mouseReport.x = 0;
-  _mouseReport.y = 0;
+  // Send movement directly - relative mouse needs fresh movement each time
+  sendRawMouse(_mouseReport.buttons, x, y, 0);
 }
 
 void BleController::mouseScroll(int8_t scroll) {
   if (!this->isConnected())
     return;
 
-  _mouseReport.wheel = scroll;
-  sendMouseReport();
-
-  // Reset scroll after sending
-  _mouseReport.wheel = 0;
+  sendRawMouse(_mouseReport.buttons, 0, 0, scroll);
 }
 
 void BleController::sendMouseReport() {
   if (!this->isConnected())
     return;
 
-  uint8_t report[5];
-  report[0] = MOUSE_REPORT_ID;
-  report[1] = _mouseReport.buttons;
-  report[2] = _mouseReport.x;
-  report[3] = _mouseReport.y;
-  report[4] = _mouseReport.wheel;
-
-  this->inputMouse->setValue(report, sizeof(report));
-  this->inputMouse->notify();
-
-#if BLE_CONTROLLER_DEBUG == 1
-  dumpHIDReport(report, sizeof(report));
-#endif
+  sendRawMouse(_mouseReport.buttons, _mouseReport.x, _mouseReport.y,
+               _mouseReport.wheel);
 }
 
 void BleController::rawMouseAction(uint8_t msg[], char msgSize) {
@@ -2363,23 +2451,69 @@ void BleController::rawMouseAction(uint8_t msg[], char msgSize) {
 }
 
 // ASCII to HID scan code conversion for printable characters
+// For shifted characters (!@#$ etc), returns the base key HID code
+// The needsShift() function determines if SHIFT modifier is needed
 uint8_t asciiToHID(char ascii) {
+  // Lowercase letters a-z
   if (ascii >= 'a' && ascii <= 'z') {
     return ascii - 'a' + 0x04; // a-z -> 0x04-0x1D
   }
+  // Uppercase letters A-Z (same HID code as lowercase, shift handled by
+  // modifier)
   if (ascii >= 'A' && ascii <= 'Z') {
-    return ascii - 'A' + 0x04; // A-Z -> 0x04-0x1D (same as lowercase, shift
-                               // handled by modifier)
+    return ascii - 'A' + 0x04;
   }
+  // Numbers 1-9
   if (ascii >= '1' && ascii <= '9') {
     return ascii - '1' + 0x1E; // 1-9 -> 0x1E-0x26
   }
 
   switch (ascii) {
+  // Number row - base keys
   case '0':
     return 0x27;
-  case ' ':
-    return 0x2C; // Space
+  case '1':
+    return 0x1E;
+  case '2':
+    return 0x1F;
+  case '3':
+    return 0x20;
+  case '4':
+    return 0x21;
+  case '5':
+    return 0x22;
+  case '6':
+    return 0x23;
+  case '7':
+    return 0x24;
+  case '8':
+    return 0x25;
+  case '9':
+    return 0x26;
+
+  // Shifted number row symbols - return base key HID code
+  case '!':
+    return 0x1E; // Shift+1
+  case '@':
+    return 0x1F; // Shift+2
+  case '#':
+    return 0x20; // Shift+3
+  case '$':
+    return 0x21; // Shift+4
+  case '%':
+    return 0x22; // Shift+5
+  case '^':
+    return 0x23; // Shift+6
+  case '&':
+    return 0x24; // Shift+7
+  case '*':
+    return 0x25; // Shift+8
+  case '(':
+    return 0x26; // Shift+9
+  case ')':
+    return 0x27; // Shift+0
+
+  // Punctuation keys - base
   case '-':
     return 0x2D; // Minus
   case '=':
@@ -2402,25 +2536,79 @@ uint8_t asciiToHID(char ascii) {
     return 0x37; // Period
   case '/':
     return 0x38; // Slash
+
+  // Shifted punctuation - return base key HID code
+  case '_':
+    return 0x2D; // Shift+Minus
+  case '+':
+    return 0x2E; // Shift+Equal
+  case '{':
+    return 0x2F; // Shift+[
+  case '}':
+    return 0x30; // Shift+]
+  case '|':
+    return 0x31; // Shift+Backslash
+  case ':':
+    return 0x33; // Shift+Semicolon
+  case '"':
+    return 0x34; // Shift+Apostrophe
+  case '~':
+    return 0x35; // Shift+Grave
+  case '<':
+    return 0x36; // Shift+Comma
+  case '>':
+    return 0x37; // Shift+Period
+  case '?':
+    return 0x38; // Shift+Slash
+
+  // Special keys - use raw USB HID codes
+  case ' ':
+    return 0x2C; // Space
   case '\n':
-    return KEY_RETURN;
+    return 0x28; // Enter (USB HID code)
   case '\r':
-    return KEY_RETURN;
+    return 0x28; // Enter
   case '\t':
-    return KEY_TAB;
+    return 0x2B; // Tab (USB HID code)
   case '\b':
-    return KEY_BACKSPACE;
+    return 0x2A; // Backspace (USB HID code)
+
   default:
-    return 0x00; // No key
+    return 0x00; // No key / unknown
   }
 }
 
 // Check if character needs shift modifier
 bool needsShift(char ascii) {
-  return (ascii >= 'A' && ascii <= 'Z') || ascii == '!' || ascii == '@' ||
-         ascii == '#' || ascii == '$' || ascii == '%' || ascii == '^' ||
-         ascii == '&' || ascii == '*' || ascii == '(' || ascii == ')' ||
-         ascii == '_' || ascii == '+' || ascii == '{' || ascii == '}' ||
-         ascii == '|' || ascii == ':' || ascii == '"' || ascii == '<' ||
-         ascii == '>' || ascii == '?';
+  // Uppercase letters
+  if (ascii >= 'A' && ascii <= 'Z')
+    return true;
+
+  // Shifted symbols
+  switch (ascii) {
+  case '!':
+  case '@':
+  case '#':
+  case '$':
+  case '%':
+  case '^':
+  case '&':
+  case '*':
+  case '(':
+  case ')':
+  case '_':
+  case '+':
+  case '{':
+  case '}':
+  case '|':
+  case ':':
+  case '"':
+  case '~':
+  case '<':
+  case '>':
+  case '?':
+    return true;
+  default:
+    return false;
+  }
 }

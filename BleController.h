@@ -32,10 +32,12 @@
 #define KEY_MOD_RALT 0x40
 #define KEY_MOD_RMETA 0x80
 
-// Mouse button definitions
+// Mouse button definitions (matching ESP32-NimBLE-Mouse)
 #define MOUSE_LEFT 0x01
 #define MOUSE_RIGHT 0x02
 #define MOUSE_MIDDLE 0x04
+#define MOUSE_BACK 0x08
+#define MOUSE_FORWARD 0x10
 
 // Keyboard report structure (8 bytes)
 typedef struct {
@@ -44,12 +46,13 @@ typedef struct {
   uint8_t keys[6];   // Up to 6 simultaneous key presses
 } keyboard_report_t;
 
-// Mouse report structure (4 bytes)
+// Mouse report structure (5 bytes - matching ESP32-NimBLE-Mouse)
 typedef struct {
-  uint8_t buttons; // Mouse button states
+  uint8_t buttons; // Mouse button states (5 buttons)
   int8_t x;        // X axis movement
   int8_t y;        // Y axis movement
   int8_t wheel;    // Scroll wheel movement
+  int8_t hWheel;   // Horizontal scroll wheel
 } mouse_report_t;
 
 class BleController {
@@ -122,9 +125,10 @@ public:
   BleControllerConfiguration configuration;
 
   BleController(std::string deviceName = "ESP32 BLE Controller",
-             std::string deviceManufacturer = "Espressif",
-             uint8_t batteryLevel = 100, bool delayAdvertising = false);
-  void begin(BleControllerConfiguration *config = new BleControllerConfiguration());
+                std::string deviceManufacturer = "Espressif",
+                uint8_t batteryLevel = 100, bool delayAdvertising = false);
+  void
+  begin(BleControllerConfiguration *config = new BleControllerConfiguration());
   void end(void);
   void setAxes(int16_t x = 0, int16_t y = 0, int16_t z = 0, int16_t rX = 0,
                int16_t rY = 0, int16_t rZ = 0, int16_t slider1 = 0,
@@ -229,6 +233,10 @@ public:
   void keyboardPrint(String str);
   void setKeyboardModifiers(uint8_t modifiers);
   void sendKeyboardReport();
+  void typeChar(char c); // Type a single character with proper shift
+  void sendRawKeyboard(uint8_t modifiers, uint8_t key1, uint8_t key2 = 0,
+                       uint8_t key3 = 0, uint8_t key4 = 0, uint8_t key5 = 0,
+                       uint8_t key6 = 0);
 
   // Mouse methods
   void mouseClick(uint8_t button = MOUSE_LEFT);
@@ -238,13 +246,14 @@ public:
   void mouseMove(int8_t x, int8_t y);
   void mouseScroll(int8_t scroll);
   void sendMouseReport();
+  void sendRawMouse(uint8_t buttons, int8_t x, int8_t y, int8_t wheel);
 
 protected:
   virtual void onStarted(NimBLEServer *pServer) {};
 };
 
 uint8_t asciiToHID(char ascii);
-bool needsShift(char ascii); 
+bool needsShift(char ascii);
 
 #endif // CONFIG_BT_NIMBLE_ROLE_PERIPHERAL
 #endif // CONFIG_BT_ENABLED
