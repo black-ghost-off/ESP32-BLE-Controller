@@ -9,6 +9,7 @@
  * - Keyboard functionality (key presses, text input, modifiers)
  * - Mouse functionality (clicks, movement, scroll wheel)
  * - All combined in one HID device descriptor
+ * - NEW: Configurable device types and options
  *
  * Hardware Requirements:
  * - ESP32-C3 development board
@@ -51,6 +52,21 @@ void setup() {
   BleControllerConfig.setHatSwitchCount(2); // 2 hat switches
   BleControllerConfig.setAxesMax(32767);    // 16-bit axes resolution
   BleControllerConfig.setAxesMin(-32767);
+  
+  // NEW: Configure which devices are enabled (default: all)
+  // BleControllerConfig.setEnabledDevices(DEVICE_ALL);  // All devices (default)
+  // Or use individual setters:
+  BleControllerConfig.setGamepadEnabled(true);   // Enable gamepad
+  BleControllerConfig.setKeyboardEnabled(true);  // Enable keyboard  
+  BleControllerConfig.setMouseEnabled(true);     // Enable mouse
+  
+  // NEW: Configure keyboard options
+  BleControllerConfig.setKeyboardKeyCount(6);    // 6 simultaneous keys (default)
+  
+  // NEW: Configure mouse options
+  BleControllerConfig.setMouseButtonCount(5);    // 5 buttons (left, right, middle, back, forward)
+  BleControllerConfig.setMouseWheelEnabled(true);  // Enable vertical scroll
+  BleControllerConfig.setMouseHWheelEnabled(true); // Enable horizontal scroll
 
   // Begin the BLE Controller with multi-HID support
   BleController.begin(&BleControllerConfig);

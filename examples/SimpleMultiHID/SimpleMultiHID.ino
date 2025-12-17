@@ -5,18 +5,36 @@
  * functionality on ESP32-C3 with a single BLE connection.
  *
  * The device will cycle through different input types every few seconds.
+ * 
+ * NEW: You can now configure which devices are enabled!
+ * See ConfigurableMultiHID example for advanced configuration.
  */
 
 #include <BleController.h>
 
 BleController bleDevice("ESP32-C3 Multi-Device", "Espressif");
+BleControllerConfiguration config;
 
 void setup() {
   Serial.begin(115200);
   Serial.println("ESP32-C3 Multi-functional HID Device");
 
+  // Optional: Configure which devices to enable (default is all)
+  // Uncomment lines below to customize:
+  // config.setGamepadEnabled(true);   // Enable gamepad
+  // config.setKeyboardEnabled(true);  // Enable keyboard
+  // config.setMouseEnabled(true);     // Enable mouse
+  
+  // Optional: Configure keyboard (1-6 simultaneous keys)
+  // config.setKeyboardKeyCount(6);
+  
+  // Optional: Configure mouse
+  // config.setMouseButtonCount(5);    // 1-5 buttons
+  // config.setMouseWheelEnabled(true);
+  // config.setMouseHWheelEnabled(true);
+
   // Start the multi-HID device
-  bleDevice.begin();
+  bleDevice.begin(&config);
   Serial.println("Waiting for Bluetooth connection...");
 }
 

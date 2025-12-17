@@ -27,7 +27,13 @@ BleControllerConfiguration::BleControllerConfiguration() : _controllerType(CONTR
                                                      _enableOutputReport(false),
                                                      _enableNordicUARTService(false),
                                                      _outputReportLength(64),
-                                                     _transmitPowerLevel(9)
+                                                     _transmitPowerLevel(9),
+                                                     _enabledDevices(DEVICE_ALL),
+                                                     _keyboardKeyCount(6),
+                                                     _keyboardMediaKeysEnabled(false),
+                                                     _mouseButtonCount(5),
+                                                     _mouseWheelEnabled(true),
+                                                     _mouseHWheelEnabled(true)
 {
 }
 
@@ -136,6 +142,21 @@ bool BleControllerConfiguration::getEnableNordicUARTService(){ return _enableNor
 uint16_t BleControllerConfiguration::getOutputReportLength(){ return _outputReportLength; }
 int8_t BleControllerConfiguration::getTXPowerLevel(){ return _transmitPowerLevel; }	// Returns the power level that was set as the server started
 
+// Device enable getters
+uint8_t BleControllerConfiguration::getEnabledDevices(){ return _enabledDevices; }
+bool BleControllerConfiguration::getGamepadEnabled(){ return (_enabledDevices & DEVICE_GAMEPAD) != 0; }
+bool BleControllerConfiguration::getKeyboardEnabled(){ return (_enabledDevices & DEVICE_KEYBOARD) != 0; }
+bool BleControllerConfiguration::getMouseEnabled(){ return (_enabledDevices & DEVICE_MOUSE) != 0; }
+
+// Keyboard configuration getters
+uint8_t BleControllerConfiguration::getKeyboardKeyCount(){ return _keyboardKeyCount; }
+bool BleControllerConfiguration::getKeyboardMediaKeysEnabled(){ return _keyboardMediaKeysEnabled; }
+
+// Mouse configuration getters
+uint8_t BleControllerConfiguration::getMouseButtonCount(){ return _mouseButtonCount; }
+bool BleControllerConfiguration::getMouseWheelEnabled(){ return _mouseWheelEnabled; }
+bool BleControllerConfiguration::getMouseHWheelEnabled(){ return _mouseHWheelEnabled; }
+
 void BleControllerConfiguration::setWhichSpecialButtons(bool start, bool select, bool menu, bool home, bool back, bool volumeInc, bool volumeDec, bool volumeMute)
 {
     _whichSpecialButtons[START_BUTTON] = start;
@@ -215,3 +236,31 @@ void BleControllerConfiguration::setEnableOutputReport(bool value) { _enableOutp
 void BleControllerConfiguration::setEnableNordicUARTService(bool value) { _enableNordicUARTService = value; }
 void BleControllerConfiguration::setOutputReportLength(uint16_t value) { _outputReportLength = value; }
 void BleControllerConfiguration::setTXPowerLevel(int8_t value) { _transmitPowerLevel = value; }
+
+// Device enable setters
+void BleControllerConfiguration::setEnabledDevices(uint8_t devices) { _enabledDevices = devices; }
+void BleControllerConfiguration::setGamepadEnabled(bool value) { 
+    if (value) _enabledDevices |= DEVICE_GAMEPAD; 
+    else _enabledDevices &= ~DEVICE_GAMEPAD; 
+}
+void BleControllerConfiguration::setKeyboardEnabled(bool value) { 
+    if (value) _enabledDevices |= DEVICE_KEYBOARD; 
+    else _enabledDevices &= ~DEVICE_KEYBOARD; 
+}
+void BleControllerConfiguration::setMouseEnabled(bool value) { 
+    if (value) _enabledDevices |= DEVICE_MOUSE; 
+    else _enabledDevices &= ~DEVICE_MOUSE; 
+}
+
+// Keyboard configuration setters
+void BleControllerConfiguration::setKeyboardKeyCount(uint8_t count) { 
+    _keyboardKeyCount = (count > MAX_KEYBOARD_KEYS) ? MAX_KEYBOARD_KEYS : (count < 1 ? 1 : count); 
+}
+void BleControllerConfiguration::setKeyboardMediaKeysEnabled(bool value) { _keyboardMediaKeysEnabled = value; }
+
+// Mouse configuration setters
+void BleControllerConfiguration::setMouseButtonCount(uint8_t count) { 
+    _mouseButtonCount = (count > MAX_MOUSE_BUTTONS) ? MAX_MOUSE_BUTTONS : (count < 1 ? 1 : count); 
+}
+void BleControllerConfiguration::setMouseWheelEnabled(bool value) { _mouseWheelEnabled = value; }
+void BleControllerConfiguration::setMouseHWheelEnabled(bool value) { _mouseHWheelEnabled = value; }

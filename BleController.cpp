@@ -129,6 +129,8 @@ void BleController::begin(BleControllerConfiguration *config) {
                   numOfSimulationBytes + numOfMotionBytes +
                   configuration.getHatSwitchCount();
 
+  // =================== GAMEPAD DESCRIPTOR ===================
+  if (configuration.getGamepadEnabled()) {
   // USAGE_PAGE (Generic Desktop)
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x05;
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x01;
@@ -738,8 +740,10 @@ void BleController::begin(BleControllerConfiguration *config) {
 
   // END_COLLECTION (Application) - End Controller collection
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0xc0;
+  } // End Gamepad Enabled
 
   // =================== KEYBOARD DESCRIPTOR ===================
+  if (configuration.getKeyboardEnabled()) {
   // USAGE_PAGE (Generic Desktop)
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x05;
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x01;
@@ -800,9 +804,9 @@ void BleController::begin(BleControllerConfiguration *config) {
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x81;
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x03;
 
-  // REPORT_COUNT (6) - Key array
+  // REPORT_COUNT (configurable key count, default 6) - Key array
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x95;
-  tempHidReportDescriptor[hidReportDescriptorSize++] = 0x06;
+  tempHidReportDescriptor[hidReportDescriptorSize++] = configuration.getKeyboardKeyCount();
 
   // REPORT_SIZE (8)
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x75;
@@ -834,8 +838,10 @@ void BleController::begin(BleControllerConfiguration *config) {
 
   // END_COLLECTION (Application) - End keyboard collection
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0xc0;
+  } // End Keyboard Enabled
 
   // =================== MOUSE DESCRIPTOR ===================
+  if (configuration.getMouseEnabled()) {
   // Based on ESP32-NimBLE-Mouse reference implementation
   // Report format: buttons(1 byte) + X(1) + Y(1) + wheel(1) + hWheel(1) = 5
   // bytes
@@ -864,7 +870,10 @@ void BleController::begin(BleControllerConfiguration *config) {
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x85;
   tempHidReportDescriptor[hidReportDescriptorSize++] = MOUSE_REPORT_ID;
 
-  // ---- Buttons (5 buttons + 3 bit padding = 1 byte) ----
+  // ---- Buttons (configurable button count + padding bits = 1 byte) ----
+  uint8_t mouseButtonCount = configuration.getMouseButtonCount();
+  uint8_t mousePaddingBits = 8 - mouseButtonCount;
+  
   // USAGE_PAGE (Button)
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x05;
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x09;
@@ -873,9 +882,9 @@ void BleController::begin(BleControllerConfiguration *config) {
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x19;
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x01;
 
-  // USAGE_MAXIMUM (Button 5)
+  // USAGE_MAXIMUM (Button N - configurable)
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x29;
-  tempHidReportDescriptor[hidReportDescriptorSize++] = 0x05;
+  tempHidReportDescriptor[hidReportDescriptorSize++] = mouseButtonCount;
 
   // LOGICAL_MINIMUM (0)
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x15;
@@ -889,17 +898,17 @@ void BleController::begin(BleControllerConfiguration *config) {
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x75;
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x01;
 
-  // REPORT_COUNT (5) - 5 button bits
+  // REPORT_COUNT (N button bits - configurable)
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x95;
-  tempHidReportDescriptor[hidReportDescriptorSize++] = 0x05;
+  tempHidReportDescriptor[hidReportDescriptorSize++] = mouseButtonCount;
 
-  // INPUT (Data,Var,Abs) - 5 button bits
+  // INPUT (Data,Var,Abs) - button bits
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x81;
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x02;
 
-  // REPORT_SIZE (3) - 3 bit padding
+  // REPORT_SIZE (padding bits)
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x75;
-  tempHidReportDescriptor[hidReportDescriptorSize++] = 0x03;
+  tempHidReportDescriptor[hidReportDescriptorSize++] = mousePaddingBits;
 
   // REPORT_COUNT (1)
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x95;
@@ -942,7 +951,8 @@ void BleController::begin(BleControllerConfiguration *config) {
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x81;
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x06;
 
-  // ---- Vertical Wheel (1 byte) ----
+  // ---- Vertical Wheel (1 byte) - Conditional ----
+  if (configuration.getMouseWheelEnabled()) {
   // USAGE (Wheel)
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x09;
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x38;
@@ -966,8 +976,10 @@ void BleController::begin(BleControllerConfiguration *config) {
   // INPUT (Data,Var,Rel) - Relative movement
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x81;
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x06;
+  } // End Mouse Wheel Enabled
 
-  // ---- Horizontal Wheel (1 byte) ----
+  // ---- Horizontal Wheel (1 byte) - Conditional ----
+  if (configuration.getMouseHWheelEnabled()) {
   // USAGE_PAGE (Consumer Devices)
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x05;
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x0c;
@@ -996,12 +1008,14 @@ void BleController::begin(BleControllerConfiguration *config) {
   // INPUT (Data,Var,Rel)
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x81;
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0x06;
+  } // End Mouse Horizontal Wheel Enabled
 
   // END_COLLECTION (Physical) - End mouse pointer collection
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0xc0;
 
   // END_COLLECTION (Application) - End mouse collection
   tempHidReportDescriptor[hidReportDescriptorSize++] = 0xc0;
+  } // End Mouse Enabled
 
   // Set task priority from 5 to 1 in order to get ESP32-C3 working
   xTaskCreate(this->taskServer, "server", 20000, (void *)this, 1, NULL);
@@ -2092,18 +2106,27 @@ void BleController::taskServer(void *pvParameter) {
 
   BleControllerInstance->hid = new NimBLEHIDDevice(pServer);
 
-  BleControllerInstance->inputController =
-      BleControllerInstance->hid->getInputReport(
-          BleControllerInstance->configuration
-              .getHidReportId()); // <-- input REPORTID from report map
-  BleControllerInstance->connectionStatus->inputController =
-      BleControllerInstance->inputController;
+  // Initialize gamepad input characteristic if enabled
+  if (BleControllerInstance->configuration.getGamepadEnabled()) {
+    BleControllerInstance->inputController =
+        BleControllerInstance->hid->getInputReport(
+            BleControllerInstance->configuration
+                .getHidReportId()); // <-- input REPORTID from report map
+    BleControllerInstance->connectionStatus->inputController =
+        BleControllerInstance->inputController;
+  }
 
-  // Initialize keyboard and mouse input characteristics
-  BleControllerInstance->inputKeyboard =
-      BleControllerInstance->hid->getInputReport(KEYBOARD_REPORT_ID);
-  BleControllerInstance->inputMouse =
-      BleControllerInstance->hid->getInputReport(MOUSE_REPORT_ID);
+  // Initialize keyboard input characteristic if enabled
+  if (BleControllerInstance->configuration.getKeyboardEnabled()) {
+    BleControllerInstance->inputKeyboard =
+        BleControllerInstance->hid->getInputReport(KEYBOARD_REPORT_ID);
+  }
+
+  // Initialize mouse input characteristic if enabled
+  if (BleControllerInstance->configuration.getMouseEnabled()) {
+    BleControllerInstance->inputMouse =
+        BleControllerInstance->hid->getInputReport(MOUSE_REPORT_ID);
+  }
 
   if (BleControllerInstance->enableOutputReport) {
     BleControllerInstance->outputController =

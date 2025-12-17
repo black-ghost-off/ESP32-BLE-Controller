@@ -5,7 +5,18 @@
 #define POSSIBLEAXES 8
 #define POSSIBLESIMULATIONCONTROLS 5
 
+// Maximum keyboard keys that can be pressed simultaneously
+#define MAX_KEYBOARD_KEYS 6
+// Maximum mouse buttons
+#define MAX_MOUSE_BUTTONS 5
+
 #include <Arduino.h>
+
+// Device type flags for enabling/disabling HID devices
+#define DEVICE_GAMEPAD   0x01
+#define DEVICE_KEYBOARD  0x02
+#define DEVICE_MOUSE     0x04
+#define DEVICE_ALL       (DEVICE_GAMEPAD | DEVICE_KEYBOARD | DEVICE_MOUSE)
 
 #define CONTROLLER_TYPE_JOYSTICK 0x04
 #define CONTROLLER_TYPE_CONTROLLER 0x05
@@ -241,7 +252,18 @@ private:
     bool _enableNordicUARTService;
     uint16_t _outputReportLength;
     int8_t _transmitPowerLevel;
- 
+    
+    // Device enable flags
+    uint8_t _enabledDevices;  // Bitmask: DEVICE_GAMEPAD, DEVICE_KEYBOARD, DEVICE_MOUSE
+    
+    // Keyboard configuration
+    uint8_t _keyboardKeyCount;          // Number of simultaneous keys (1-6, default 6)
+    bool _keyboardMediaKeysEnabled;     // Enable media keys (play, pause, volume, etc.)
+    
+    // Mouse configuration  
+    uint8_t _mouseButtonCount;          // Number of mouse buttons (1-5, default 5)
+    bool _mouseWheelEnabled;            // Enable vertical scroll wheel
+    bool _mouseHWheelEnabled;           // Enable horizontal scroll wheel
 
 public:
     BleControllerConfiguration();
@@ -300,6 +322,21 @@ public:
     bool getEnableNordicUARTService();
     uint16_t getOutputReportLength();
     int8_t getTXPowerLevel();
+    
+    // Device enable getters
+    uint8_t getEnabledDevices();
+    bool getGamepadEnabled();
+    bool getKeyboardEnabled();
+    bool getMouseEnabled();
+    
+    // Keyboard configuration getters
+    uint8_t getKeyboardKeyCount();
+    bool getKeyboardMediaKeysEnabled();
+    
+    // Mouse configuration getters
+    uint8_t getMouseButtonCount();
+    bool getMouseWheelEnabled();
+    bool getMouseHWheelEnabled();
 
     void setControllerType(uint8_t controllerType);
     void setAutoReport(bool value);
@@ -350,6 +387,21 @@ public:
     void setEnableNordicUARTService(bool value);
     void setOutputReportLength(uint16_t value);
     void setTXPowerLevel(int8_t value);
+    
+    // Device enable setters
+    void setEnabledDevices(uint8_t devices);  // Use bitmask: DEVICE_GAMEPAD | DEVICE_KEYBOARD | DEVICE_MOUSE
+    void setGamepadEnabled(bool value);
+    void setKeyboardEnabled(bool value);
+    void setMouseEnabled(bool value);
+    
+    // Keyboard configuration setters
+    void setKeyboardKeyCount(uint8_t count);          // 1-6 simultaneous keys
+    void setKeyboardMediaKeysEnabled(bool value);
+    
+    // Mouse configuration setters
+    void setMouseButtonCount(uint8_t count);          // 1-5 buttons
+    void setMouseWheelEnabled(bool value);
+    void setMouseHWheelEnabled(bool value);
 };
 
 #endif

@@ -9,6 +9,9 @@
    Values correlate to dbm
 
    You can get the currently set TX power level by calling BleController.setTXPowerLevel()
+   
+   NEW: This example also shows how to configure which devices are enabled
+   (Gamepad, Keyboard, Mouse) and their specific options.
 
 */
 
@@ -40,6 +43,24 @@ void setup()
   //BleControllerConfig.setAxesMin(0x8001); // -32767 --> int16_t - 16 bit signed integer - Can be in decimal or hexadecimal
   BleControllerConfig.setAxesMin(0x0000); // 0 --> int16_t - 16 bit signed integer - Can be in decimal or hexadecimal
   BleControllerConfig.setAxesMax(0x7FFF); // 32767 --> int16_t - 16 bit signed integer - Can be in decimal or hexadecimal
+  
+  // ============ NEW: Device Configuration Options ============
+  // Configure which devices are enabled (default: all devices enabled)
+  // Use bitmask: DEVICE_GAMEPAD | DEVICE_KEYBOARD | DEVICE_MOUSE or DEVICE_ALL
+  BleControllerConfig.setEnabledDevices(DEVICE_ALL);  // Enable all devices
+  // Or individually:
+  // BleControllerConfig.setGamepadEnabled(true);
+  // BleControllerConfig.setKeyboardEnabled(true);
+  // BleControllerConfig.setMouseEnabled(true);
+  
+  // Keyboard configuration (only applies if keyboard is enabled)
+  BleControllerConfig.setKeyboardKeyCount(6);         // 1-6 simultaneous keys (default: 6)
+  
+  // Mouse configuration (only applies if mouse is enabled)
+  BleControllerConfig.setMouseButtonCount(5);         // 1-5 buttons (default: 5)
+  BleControllerConfig.setMouseWheelEnabled(true);     // Enable vertical scroll wheel
+  BleControllerConfig.setMouseHWheelEnabled(true);    // Enable horizontal scroll wheel
+  // ============ End Device Configuration Options ============
 
   BleController.begin(&BleControllerConfig); // Begin Controller with configuration options
   

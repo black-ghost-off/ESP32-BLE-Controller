@@ -26,6 +26,9 @@ Published under the MIT license. Please see license.txt.
  - [x] Functions available for force pairing/ignore current client and/or delete pairings
  - [x] Nordic UART Service functionality at same time as Controller. See examples
  - [x] Multi-functional HID device support (Controller + Keyboard + Mouse in single BLE connection)
+ - [x] **Configurable device types** - Enable/disable Gamepad, Keyboard, Mouse independently
+ - [x] **Configurable keyboard** - Set number of simultaneous keys (1-6)
+ - [x] **Configurable mouse** - Set button count (1-5), enable/disable scroll wheels
  - [x] Keyboard functionality (key press/release, text input, modifier keys, function keys)
  - [x] Mouse functionality (left/right/middle click, movement, scroll wheel)
  - [x] Raw HID report support for keyboard and mouse
@@ -265,9 +268,101 @@ void loop() {
 ### Examples:
 - `SimpleMultiHID.ino` - Basic multi-device functionality
 - `MultiFunctionalHID.ino` - Advanced usage with all features demonstrated
+- `ConfigurableMultiHID.ino` - **NEW** Configure which devices to enable and their options
 
 This multi-HID functionality is particularly useful for:
 - **Gaming applications** where you need Controller controls plus keyboard shortcuts
 - **Accessibility devices** that combine multiple input methods
 - **Remote control applications** with comprehensive input capabilities
 - **Creative/productivity tools** that benefit from multiple input modalities
+
+## Device Configuration
+
+You can configure which HID devices are enabled and customize their settings. By default, all devices (Gamepad, Keyboard, Mouse) are enabled.
+
+### Device Enable/Disable Constants:
+```cpp
+DEVICE_GAMEPAD   // Gamepad/Controller device
+DEVICE_KEYBOARD  // Keyboard device
+DEVICE_MOUSE     // Mouse device
+DEVICE_ALL       // All devices (default)
+```
+
+### Device Configuration Example:
+```cpp
+BleControllerConfiguration config;
+
+// Method 1: Using bitmask
+config.setEnabledDevices(DEVICE_KEYBOARD | DEVICE_MOUSE);  // Only keyboard and mouse
+
+// Method 2: Using individual setters
+config.setGamepadEnabled(false);   // Disable gamepad
+config.setKeyboardEnabled(true);   // Enable keyboard
+config.setMouseEnabled(true);      // Enable mouse
+
+bleController.begin(&config);
+```
+
+### Keyboard Configuration:
+```cpp
+// Set number of simultaneous keys (1-6, default: 6)
+config.setKeyboardKeyCount(6);
+
+// Check current setting
+uint8_t keyCount = config.getKeyboardKeyCount();
+```
+
+### Mouse Configuration:
+```cpp
+// Set number of mouse buttons (1-5, default: 5)
+// 1=left, 2=left+right, 3=left+right+middle, 5=all including back/forward
+config.setMouseButtonCount(3);
+
+// Enable/disable scroll wheel (default: enabled)
+config.setMouseWheelEnabled(true);
+
+// Enable/disable horizontal scroll (default: enabled)
+config.setMouseHWheelEnabled(true);
+
+// Check current settings
+uint8_t buttonCount = config.getMouseButtonCount();
+bool hasWheel = config.getMouseWheelEnabled();
+bool hasHWheel = config.getMouseHWheelEnabled();
+```
+
+### Common Device Configurations:
+
+**Gamepad Only (Game Controller):**
+```cpp
+config.setGamepadEnabled(true);
+config.setKeyboardEnabled(false);
+config.setMouseEnabled(false);
+config.setButtonCount(16);
+config.setHatSwitchCount(1);
+```
+
+**Keyboard + Mouse (Desktop Remote):**
+```cpp
+config.setGamepadEnabled(false);
+config.setKeyboardEnabled(true);
+config.setMouseEnabled(true);
+config.setKeyboardKeyCount(6);
+config.setMouseButtonCount(3);
+config.setMouseWheelEnabled(true);
+```
+
+**Simple Mouse (Presentation Clicker):**
+```cpp
+config.setGamepadEnabled(false);
+config.setKeyboardEnabled(false);
+config.setMouseEnabled(true);
+config.setMouseButtonCount(1);      // Left click only
+config.setMouseWheelEnabled(false);
+config.setMouseHWheelEnabled(false);
+```
+
+**All Devices (Multi-functional HID):**
+```cpp
+config.setEnabledDevices(DEVICE_ALL);  // or just use defaults
+```
+
